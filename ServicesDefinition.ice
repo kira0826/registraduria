@@ -54,7 +54,7 @@ module RegistryModule
 
         Object connection(string hostname);
 
-        string makequery(IntSeq ids);
+        string makeQuery(IntSeq ids);
 
         string executeQuery(string query);
 

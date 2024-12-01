@@ -13,6 +13,8 @@ public class ProxyPoolConnection {
         try (Communicator communicator = Util.initialize(args)) {
             // Imprimir las propiedades recibidas
             Properties properties = communicator.getProperties();
+
+            
             System.out.println("Propiedades recibidas:");
             for (String key : properties.getPropertiesForPrefix("").keySet()) {
                 System.out.println(key + " = " + properties.getProperty(key));

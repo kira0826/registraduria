@@ -8,5 +8,4 @@ build
 *bin/
 .vscode
 .gradle
-gradle      
 !.gitignore

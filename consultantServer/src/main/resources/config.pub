@@ -1,7 +1,7 @@
 #
 # This property is used by the clients to connect to IceStorm.
 #
-TopicManager.Proxy=DemoIceStorm/TopicManager:default -h localhost -p 10000
+TopicManager.Proxy=DemoIceStorm/TopicManager:default -h hgrid2 -p 10000
 
 #
 # Network Tracing
@@ -25,5 +25,5 @@ IceMX.Metrics.ByParent.GroupBy=parent
 # Server configuration
 
 TaskManager.Endpoints=tcp -p 30002
-Ice.Default.Host=localhost
+Ice.Default.Host=10.147.19.108
 Ice.ThreadPool.Server.Size=4

@@ -7,7 +7,7 @@ public class ConsultantServer {
 
         // Try with resources block - communicator is automatically destroyed
         // at the end of this try block
-        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config/config.pub",
+        try (com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.pub",
                 extraArgs)) {
             // Set the package for generated classes
             communicator.getProperties().setProperty("Ice.Default.Package", "Demo");

@@ -192,6 +192,7 @@ public class ConsultantAuxiliar {
                 topicF.unsubscribe(subscriberF);
             } finally {
                 communicator.destroy();
+                /*Comentario de prueba*/
             }
         }));
         Runtime.getRuntime().removeShutdownHook(destroyHook); // remove old destroy-only shutdown hook

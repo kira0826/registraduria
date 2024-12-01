@@ -17,6 +17,9 @@ public class DatabaseConfig {
         config.setIdleTimeout(30000); // Tiempo de espera para liberar conexiones inactivas (ms)
         config.setMaxLifetime(1800000); // Tiempo máximo de vida de una conexión (ms)
         config.setConnectionTimeout(20000); // Tiempo máximo para obtener una conexión (ms)
+        config.setConnectionTestQuery("SELECT 1");
+        config.addDataSourceProperty("logger", "com.zaxxer.hikari.HikariLogger");
+        config.addDataSourceProperty("logLevel", "TRACE");
 
         dataSource = new HikariDataSource(config);
     }

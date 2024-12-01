@@ -12,7 +12,7 @@ public class DatabaseConfig {
         config.setJdbcUrl("jdbc:postgresql://xhgrid3:5432/votaciones");
         config.setUsername("postgres");
         config.setPassword("postgres");
-        config.setMaximumPoolSize(10); // Tamaño máximo del pool
+        config.setMaximumPoolSize(10); // Tamaño máximo de  l pool
         config.setMinimumIdle(2); // Mínimo de conexiones inactivas
         config.setIdleTimeout(30000); // Tiempo de espera para liberar conexiones inactivas (ms)
         config.setMaxLifetime(1800000); // Tiempo máximo de vida de una conexión (ms)
@@ -22,7 +22,7 @@ public class DatabaseConfig {
     }
 
     public static DataSource getDataSource() {
-        return dataSource;
+        return dataSource;  
     }
 
     public static void close() {

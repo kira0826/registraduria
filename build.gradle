@@ -32,20 +32,29 @@ subprojects {
         }
     }
 
-    shadowJar {
-        archiveBaseName.set('ProxyPoolConnectionFAT') 
-        archiveVersion.set('1.0.0')                  
-        archiveClassifier.set('all')                 
+shadowJar {
+    archiveBaseName.set('ProxyPoolConnectionFATJAR')
+    archiveVersion.set('1.0.0')
+    archiveClassifier.set('all')
 
-        mergeServiceFiles() 
-
-        manifest {
-            attributes(                 
-                "Main-Class" : project.name.capitalize(),
-                "Class-Path": '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
-            )
-        }
+    // Incluir las clases compiladas en build/classes
+    from('build/classes/java') {
+        include '**/*.class'  // Incluir todas las clases compiladas
     }
+
+    // Incluir los recursos también si es necesario
+    from('src/main/resources') {
+        include '**'  // Incluir todos los recursos
+    }
+
+    manifest {
+        attributes(
+            'Main-Class': 'proxyPoolConnection.ProxyPoolConnection',  // Clase principal específica
+             'Class-Path': '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
+        )   
+    }
+}
+
 
     jar {
         manifest {

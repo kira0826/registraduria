@@ -117,7 +117,7 @@ public class ConsultantAuxiliar {
             }
         }
 
-        com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Clock.Subscriber");
+        com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Auxiliar.Subscriber");
 
         //
         // Add a servant for the Ice object. If --id is used the

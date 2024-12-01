@@ -9,16 +9,17 @@
             <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="on-demand">
                 <option>-jar</option>
                 <option>../proxyPoolConnection/build/libs/proxyPoolConnection.jar</option>
-                <adapter identity="ProxyPoolConnectionIdentity" name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} -p ${port}"/>
+                <adapter  name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} -p ${port}"/>
+                <property name="Identity" value="ProxyPoolConnectionIdentity" />
             </server>
         </server-template>
     </application>
-    
+
     <node name="Node1">
         <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85" port="10001"/>
     </node>
 
     <node name="Node2">
-        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.239" port="10002" />
+        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" port="10002" />
     </node>
 </icegrid>

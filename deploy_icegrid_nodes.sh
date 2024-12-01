@@ -5,18 +5,26 @@
 # -----------------------------
 
 # Número de nodos a desplegar
-NUM_NODES=2
+NUM_NODES=6
 
 # Lista de direcciones de los nodos (usuario@host)
 NODE_ADDRESSES=(
     "computacion2@xhgrid17"
     "computacion2@xhgrid18"
+    "computacion2@xhgrid5"
+    "computacion2@xhgrid6"
+    "computacion2@xhgrid7"
+    "computacion2@xhgrid8"
 )
 
 # Lista de Endpoints para cada nodo (uno por nodo)
 NODE_ENDPOINTS=(
     "tcp -h 10.147.19.85 -p 10001"
     "tcp -h 10.147.19.239 -p 10002"
+    "tcp -h 10.147.19.112 -p 10003"
+    "tcp -h 10.147.19.230 -p 10004"
+    "tcp -h 10.147.19.139 -p 10005"
+    "tcp -h 10.147.19.137 -p 10006"
 )
 
 # IP del Locator (Registro)

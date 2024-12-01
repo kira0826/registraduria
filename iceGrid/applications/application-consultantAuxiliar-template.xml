@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<icegrid>
+    <application name="ConsultantAuxiliar">
+        <server-template id="ConsultantAuxiliarServer">
+            <parameter name="index"/>
+            <parameter name="host"/>
+            <parameter name="port"/>
+            <server id="ConsultantAuxiliarServer-${index}" exe="java" activation="on-demand">
+                <option>-jar</option>
+                <option>../consultantAuxiliar/build/libs/consultantAuxiliar.jar</option>
+                <adapter name="ConsultantAuxiliarAdapter" endpoints="tcp -h ${host} -p ${port}"/>
+                <property name="Identity" value="ConsultantAuxiliarIdentity" />
+            </server>
+        </server-template>
+    </application>
+
+    <node name="Node3">
+        <server-instance template="ConsultantAuxiliarServer" index="1" host="10.147.19.112" port="10003"/>
+    </node>
+
+    <node name="Node4">
+        <server-instance template="ConsultantAuxiliarServer" index="2" host="10.147.19.230" port="10004" />
+    </node>
+
+    <node name="Node5">
+        <server-instance template="ConsultantAuxiliarServer" index="3" host="10.147.19.139" port="10005"/>
+    </node>
+
+    <node name="Node6">
+        <server-instance template="ConsultantAuxiliarServer" index="4" host="10.147.19.137" port="10006" />
+    </node>
+</icegrid>

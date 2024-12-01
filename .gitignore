@@ -4,6 +4,7 @@
 build
 *build/
 **.jar
+!gradle-wrapper.jar
 .*
 *bin/
 .vscode

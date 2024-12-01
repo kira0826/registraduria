@@ -2,18 +2,17 @@ import com.zeroc.Ice.Current;
 
 import RegistryModule.Task;
 
-public class TaskManagerImpl implements RegistryModule.TaskManager{
+//Servant Class
+public class TaskManagerImpl implements RegistryModule.TaskManager {
 
     @Override
     public void addPartialResult(String result, Current current) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'addPartialResult'");
+        System.out.println("Partial result added: " + result);
     }
 
     @Override
     public Task getTask(Current current) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getTask'");
+        return new Task();
     }
-    
+
 }

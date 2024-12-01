@@ -24,9 +24,11 @@ subprojects {
 
     dependencies {
         implementation 'com.zeroc:ice:3.7.6'
+        implementation 'com.zeroc:icestorm:3.7.10'
         implementation 'com.zaxxer:HikariCP:6.2.1'
         implementation 'org.postgresql:postgresql:42.7.4'
     }
+    
     jar {
         manifest {
             attributes(

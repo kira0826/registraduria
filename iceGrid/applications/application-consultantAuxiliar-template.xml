@@ -9,8 +9,11 @@
             <server id="ConsultantAuxiliarServer-${index}" exe="java" activation="on-demand">
                 <option>-jar</option>
                 <option>../consultantAuxiliar/build/libs/consultantAuxiliar.jar</option>
-                <adapter name="ConsultantAuxiliarAdapter" endpoints="tcp -h ${host} -p ${port}"/>
-                <property name="Identity" value="ConsultantAuxiliarIdentity" />
+                <adapter  name="ConsultantAuxiliarAdapter" endpoints="tcp -h ${host} -p ${port}">
+                    <object identity="ConsultantAuxiliarManagerIdentity-${index}" type="::RegistryModule::ConsultantAuxiliarManager" property="Identity" />
+                    <object identity="ConsultantManagerIdentity-${index}" type="::RegistryModule::ConsultantManager" property="Identity" />
+                    <object identity="MathPrimesIdentity-${index}" type="::RegistryModule::MathPrimes" property="Identity" />
+                </adapter>
             </server>
         </server-template>
     </application>

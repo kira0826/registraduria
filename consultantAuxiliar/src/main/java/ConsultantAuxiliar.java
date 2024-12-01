@@ -7,7 +7,7 @@ public class ConsultantAuxiliar {
         int status = 0;
         java.util.List<String> extraArgs = new java.util.ArrayList<String>();
 
-        com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config/config.sub", extraArgs);
+        com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.sub", extraArgs);
         // Set the package for generated classes
         communicator.getProperties().setProperty("Ice.Default.Package", "Demo");
 

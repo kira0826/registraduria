@@ -11,7 +11,7 @@ NUM_NODES=6
 NODE_ADDRESSES=(
     "computacion2@xhgrid17"
     "computacion2@xhgrid18"
-    "computacion2@xhgrid5"
+    "computacion2@xhgrid9"
     "computacion2@xhgrid6"
     "computacion2@xhgrid7"
     "computacion2@xhgrid8"
@@ -21,7 +21,7 @@ NODE_ADDRESSES=(
 NODE_ENDPOINTS=(
     "tcp -h 10.147.19.85 -p 10001"
     "tcp -h 10.147.19.239 -p 10002"
-    "tcp -h 10.147.19.112 -p 10003"
+    "tcp -h 10.147.19.147 -p 10003"
     "tcp -h 10.147.19.230 -p 10004"
     "tcp -h 10.147.19.139 -p 10005"
     "tcp -h 10.147.19.137 -p 10006"

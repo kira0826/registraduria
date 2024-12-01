@@ -5,6 +5,7 @@
         <server-template id="ProxyPoolConnectionServer">
             <parameter name="index"/>
             <parameter name="host"/>
+            <parameter name="dbHost"/>
             <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="always" >
                 <option>-jar</option>
                 <option>/home/computacion2/icegrid_node/jars/proxyPoolConnection-all.jar</option>
@@ -16,9 +17,9 @@
         </server-template>
     </application>
     <node name="Node1">
-        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85"/>
+        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85" dbHost="xhgrid3"/>
     </node>
     <node name="Node2">
-        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239"/>
+        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" dbHost="xhgrid98"/>
     </node>
 </icegrid>

@@ -18,6 +18,10 @@ public class ProxyPoolConnection {
                 System.out.println(key + " = " + properties.getProperty(key));
             }
 
+            String dbHost = properties.getProperty("dbHost");
+
+            DatabaseConfig.configure(dbHost);
+
             // Crear el adaptador
             ObjectAdapter adapter = communicator.createObjectAdapter("ProxyPoolConnectionAdapter");
 

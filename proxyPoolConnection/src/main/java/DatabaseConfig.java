@@ -7,9 +7,9 @@ public class DatabaseConfig {
 
     private static HikariDataSource dataSource;
 
-    static {
+    public static void configure(String dbHost) {
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:postgresql://xhgrid3:5432/votaciones");
+        config.setJdbcUrl("jdbc:postgresql://" + dbHost + ":5432/votaciones");
         config.setUsername("postgres");
         config.setPassword("postgres");
         config.setMaximumPoolSize(10); // Tamaño máximo de  l pool
@@ -20,6 +20,10 @@ public class DatabaseConfig {
         config.setConnectionTestQuery("SELECT 1");
         config.addDataSourceProperty("logger", "com.zaxxer.hikari.HikariLogger");
         config.addDataSourceProperty("logLevel", "TRACE");
+
+        if (dataSource != null) {
+            dataSource.close();
+        }
 
         dataSource = new HikariDataSource(config);
     }

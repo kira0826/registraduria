@@ -1,18 +1,16 @@
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Identity;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.Properties;
+import com.zeroc.Ice.Util;
 
 public class ProxyPoolConnection {
 
     public static void main(String[] args) {
 
         System.out.println("Ola");
-        /* 
+        
         try (Communicator communicator = Util.initialize(args)) {
-
-
-            System.out.println("Ola");
-            /*  
-             * 
-             
-
             // Imprimir las propiedades recibidas
             Properties properties = communicator.getProperties();
             System.out.println("Propiedades recibidas:");
@@ -46,7 +44,7 @@ public class ProxyPoolConnection {
             //DatabaseConfig.close();
             System.out.println("Conexión cerrada");
         }
-             */
+             
 
     }
 }

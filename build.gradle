@@ -32,11 +32,10 @@ subprojects {
         }
     }
 
-    // Configure shadowJar for each subproject
     shadowJar {
-        // Use the subproject name for the JAR name
+
         archiveBaseName.set(project.name)
-        archiveClassifier.set('all')  // This will create JARs like 'client-all.jar'
+        archiveClassifier.set('all')  
 
         // Include compiled classes and resources
         from(sourceSets.main.output)
@@ -53,9 +52,8 @@ subprojects {
         mergeServiceFiles()
     }
 
-    // Make the regular jar task depend on shadowJar
     jar {
-        enabled = false  // Disable the regular jar task
+        enabled = false  
     }
 
     // Make sure shadowJar runs as part of the build

@@ -51,9 +51,7 @@ module RegistryModule
 
     interface PerformQuery{
 
-        string makeQuery(StringSeq ids);
 
-        string executeQuery(string query);
 
         void receiveMessage(StringSeq ids, Callback* callback);
         

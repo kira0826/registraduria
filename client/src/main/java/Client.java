@@ -5,7 +5,12 @@ public class Client {
 
     public static void main(String[] args) {
         try {
+
+
             Communicator communicator = com.zeroc.Ice.Util.initialize(args);
+
+            
+
 
             communicator.destroy();
         } catch (Exception e) {

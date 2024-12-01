@@ -5,7 +5,7 @@ import RegistryModule.CallbackPrx;
 public class ConsultantManagerImpl implements RegistryModule.ConsultantManager{
 
     @Override
-    public void performQuery(int[] ids, CallbackPrx callback, Current current) {
+    public void performQuery(String[] ids, CallbackPrx callback, Current current) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'performQuery'");
     }

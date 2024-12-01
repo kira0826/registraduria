@@ -2,7 +2,7 @@ module RegistryModule
 {
 
 
-    sequence<int> IntSeq;
+    sequence<string> StringSeq;
 
     class Response{
         long responseTime;
@@ -35,7 +35,7 @@ module RegistryModule
     interface ConsultantManager{
 
 
-        void performQuery(IntSeq ids, Callback* callback);
+        void performQuery(StringSeq ids, Callback* callback);
 
     }
 
@@ -51,14 +51,11 @@ module RegistryModule
 
     interface PerformQuery{
 
-
-        Object connection(string hostname);
-
-        string makeQuery(IntSeq ids);
+        string makeQuery(StringSeq ids);
 
         string executeQuery(string query);
 
-        void receiveMessage(IntSeq ids, Callback* callback);
+        void receiveMessage(StringSeq ids, Callback* callback);
         
     }
 
@@ -67,7 +64,7 @@ module RegistryModule
 
     class Task{
 
-        IntSeq ids;
+        StringSeq ids;
 
         string hostname;
 

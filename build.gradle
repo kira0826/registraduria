@@ -1,12 +1,13 @@
 plugins {
     id 'com.zeroc.gradle.ice-builder.slice' version '1.5.0' apply false
-    id 'java'
-    id 'com.github.johnrengelman.shadow' version '7.0.0'
+    id 'com.github.johnrengelman.shadow' version '7.0.0' apply false
 }
 
 subprojects {
+    // Apply necessary plugins for each subproject
     apply plugin: 'java'
     apply plugin: 'com.zeroc.gradle.ice-builder.slice'
+    apply plugin: 'com.github.johnrengelman.shadow'  // Apply shadow plugin to each subproject
     
     slice {
         java {
@@ -26,46 +27,37 @@ subprojects {
         implementation 'org.slf4j:slf4j-api:1.6.1'
         implementation 'ch.qos.logback:logback-classic:1.2.11'
 
-        // Exclude slf4j-simple if included by another dependency
         configurations.all {
             exclude group: 'org.slf4j', module: 'slf4j-simple'
         }
     }
 
-shadowJar {
-    archiveBaseName.set('ProxyPoolConnectionFATJAR')
-    archiveVersion.set('1.0.0')
-    archiveClassifier.set('all')
+    // Configure shadowJar for each subproject
+    shadowJar {
+        // Use the subproject name for the JAR name
+        archiveBaseName.set(project.name)
+        archiveClassifier.set('all')  // This will create JARs like 'client-all.jar'
 
-    // Incluir las clases compiladas en build/classes
-    from('build/classes/java') {
-        include '**/*.class'  // Incluir todas las clases compiladas
-    }
+        // Include compiled classes and resources
+        from(sourceSets.main.output)
 
-    // Incluir los recursos también si es necesario
-    from('src/main/resources') {
-        include '**'  // Incluir todos los recursos
-    }
-
-    manifest {
-        attributes(
-            'Main-Class': 'proxyPoolConnection.ProxyPoolConnection',  // Clase principal específica
-             'Class-Path': '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
-        )   
-    }
-}
-
-
-    jar {
+        // Configure manifest
         manifest {
             attributes(
-                "Main-Class" : project.name.capitalize(),
-                // Creamos el Class-Path con todas las dependencias
-                "Class-Path": '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
-                //"Class-Path": configurations.runtimeClasspath.collect { it.getName() }.join(' ')
+                'Main-Class': project.name.capitalize(),  // Uses the capitalized project name
+                'Class-Path': '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
             )
         }
+
+        // Merge service files if needed
+        mergeServiceFiles()
     }
 
+    // Make the regular jar task depend on shadowJar
+    jar {
+        enabled = false  // Disable the regular jar task
+    }
+
+    // Make sure shadowJar runs as part of the build
     build.dependsOn shadowJar
 }

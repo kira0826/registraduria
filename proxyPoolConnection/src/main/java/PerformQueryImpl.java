@@ -18,8 +18,8 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         this.dataSource = dataSource;
     }
 
-    @Override
-    public String executeQuery(String query, Current current) {
+    
+    private String executeQuery(String query, Current current) {
         StringBuilder resultBuilder = new StringBuilder();
 
         try (Connection connection = dataSource.getConnection();
@@ -43,8 +43,8 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         return resultBuilder.toString();
     }
 
-    @Override
-    public String makeQuery(String[] ids, Current current) {
+    
+    private String makeQuery(String[] ids, Current current) {
         StringJoiner placeholders = new StringJoiner(",");
         for (String id : ids) {
             placeholders.add(id);

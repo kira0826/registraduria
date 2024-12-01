@@ -6,10 +6,12 @@
             <parameter name="index"/>
             <parameter name="host"/>
             <parameter name="port"/>
-            <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="on-demand">
+            <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="always">
                 <option>-jar</option>
-                <option>../proxyPoolConnection/build/libs/proxyPoolConnection.jar</option>
-                <adapter identity="ProxyPoolConnectionIdentity" name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} -p ${port}"/>
+                <option>./jars/proxyPoolConnection.jar</option>
+                <adapter  name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} -p ${port}">
+                    <object identity="ProxyPoolConnectionIdentity-${index}" type="::RegistryModule::PerformQuery" property="Identity" />
+                </adapter>
             </server>
         </server-template>
     </application>
@@ -17,8 +19,7 @@
     <node name="Node1">
         <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85" port="10001"/>
     </node>
-
     <node name="Node2">
-        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.239" port="10002" />
+        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" port="10002" />
     </node>
 </icegrid>

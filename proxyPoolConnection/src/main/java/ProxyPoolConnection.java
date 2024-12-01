@@ -9,7 +9,6 @@ public class ProxyPoolConnection {
     public static void main(String[] args) {
         try (Communicator communicator = Util.initialize(args)) {
 
-
             ObjectAdapter adapter = communicator.createObjectAdapter("ProxyPoolConnectionAdapter");
             Properties properties = communicator.getProperties();
             Identity identity = Util.stringToIdentity(properties.getProperty("Identity"));

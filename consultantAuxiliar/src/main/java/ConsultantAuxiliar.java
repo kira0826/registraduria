@@ -132,7 +132,7 @@ public class ConsultantAuxiliar {
         if (subId.name == null) {
             subId.name = java.util.UUID.randomUUID().toString();
         }
-        com.zeroc.Ice.ObjectPrx subscriber = adapter.add(new ConsultantAuxiliarManagerImpl(taskManager), subId);
+        com.zeroc.Ice.ObjectPrx subscriber = adapter.add(new ConsultantAuxiliarManagerImpl(), subId);
 
         //
         // Activate the object adapter before subscribing.

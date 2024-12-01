@@ -5,11 +5,11 @@
         <server-template id="ProxyPoolConnectionServer">
             <parameter name="index"/>
             <parameter name="host"/>
-            <parameter name="port"/>
-            <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="always">
+            <server id="ProxyPoolConnectionServer-${index}" exe="java" activation="always" >
                 <option>-jar</option>
-                <option>./jars/proxyPoolConnection.jar</option>
-                <adapter  name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} -p ${port}">
+                <option>/home/computacion2/icegrid_node/jars/ProxyPoolConnectionFAT-1.0.0-all.jar</option>
+                <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/proxyPoolConnectionServer-${index}.stderr.log" />
+                <adapter  name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} ">
                     <object identity="ProxyPoolConnectionIdentity-${index}" type="::RegistryModule::PerformQuery" property="Identity" />
                 </adapter>
             </server>
@@ -17,9 +17,9 @@
     </application>
     
     <node name="Node1">
-        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85" port="10001"/>
+        <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85"/>
     </node>
     <node name="Node2">
-        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" port="10002" />
+        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239"/>
     </node>
 </icegrid>

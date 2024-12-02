@@ -166,6 +166,7 @@ public class ConsultantAuxiliar {
                 generalTopic.unsubscribe(generalSubscriber);
             } finally {
                 communicator.destroy();
+                /*Comentario de prueba*/
             }
         }));
     }

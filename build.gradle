@@ -26,7 +26,10 @@ subprojects {
         implementation 'org.postgresql:postgresql:42.7.4'
         implementation 'org.slf4j:slf4j-api:1.6.1'
         implementation 'ch.qos.logback:logback-classic:1.2.11'
-
+        implementation 'com.zeroc:icegrid:3.7.6' 
+        runtimeOnly 'com.zeroc:icelocatordiscovery:3.7.6'
+        runtimeOnly 'org.apache.commons:commons-compress:1.14'
+        
         configurations.all {
             exclude group: 'org.slf4j', module: 'slf4j-simple'
         }

@@ -9,6 +9,7 @@ import java.io.InputStreamReader;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 //Servant Class
 public class TaskManagerImpl implements TaskManager {
@@ -118,7 +119,7 @@ public class TaskManagerImpl implements TaskManager {
             System.out.println("Revisando tareas");
             List<Task> toReassign = inProgressTasks.stream()
                     .filter(task -> !completedTasks.contains(task))
-                    .toList();
+                    .collect(Collectors.toList());
             for (Task task : toReassign) {
                 taskQueue.add(task.ids);
                 inProgressTasks.remove(task);

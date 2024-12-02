@@ -8,15 +8,16 @@ import RegistryModule.ConsultantAuxiliarManagerPrx;
 import RegistryModule.TaskManager;
 import RegistryModule.TaskManagerPrx;
 
-public class ConsultantServer {
+public class ConsultantServer implements RegistryModule.ConsultantServer {
     private final String masterId;
-    private final int poolSize = 8;
+    private int poolSize = 8;
     private static final String path = "cedulas.txt";
 
     public ConsultantServer(String masterId) {
         this.masterId = masterId;
     }
 
+    
     public static void main(String[] args) {
         for (String arg : args) {
             System.out.println("arg " + arg);
@@ -137,5 +138,15 @@ public class ConsultantServer {
             }
         }
         return null;
+    }
+
+    @Override
+    public void setPoolsize(int n, Current current) {
+        this.poolSize = n;
+    }
+
+    @Override
+    public void searchDocumentsByPath(String path, Current current) {
+
     }
 }

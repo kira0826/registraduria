@@ -19,12 +19,12 @@ NODE_ADDRESSES=(
 
 # Lista de Endpoints para cada nodo (uno por nodo)
 NODE_ENDPOINTS=(
-    "tcp -h 10.147.19.85 -p 10001"
-    "tcp -h 10.147.19.239 -p 10002"
-    "tcp -h 10.147.19.147 -p 10003"
-    "tcp -h 10.147.19.230 -p 10004"
-    "tcp -h 10.147.19.139 -p 10005"
-    "tcp -h 10.147.19.137 -p 10006"
+    "tcp -h 10.147.19.85"
+    "tcp -h 10.147.19.239"
+    "tcp -h 10.147.19.147"
+    "tcp -h 10.147.19.230"
+    "tcp -h 10.147.19.139"
+    "tcp -h 10.147.19.137"
 )
 
 # IP del Locator (Registro)
@@ -76,11 +76,11 @@ IceGrid.Node.Endpoints=$NODE_ENDPOINT
 IceGrid.Node.Data=$NODE_DATA_DIR
 IceGrid.Node.CollocateRegistry=0
 
-Ice.Default.Locator=registryConsultantClient/Locator:tcp -h $LOCATOR_IP -p $LOCATOR_PORT
+Ice.Default.Locator=registryConsultantProxy/Locator:tcp -h $LOCATOR_IP -p $LOCATOR_PORT
 EOF
 
             # Ruta local al archivo de configuración de admin
-            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryclient.conf"
+            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryproxy.conf"
 
             # Verificar si el archivo existe
             if [ ! -f "$LOCAL_ADMIN_CONF" ]; then

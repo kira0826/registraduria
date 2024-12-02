@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <icegrid>
-    <application name="ConsultantAuxiliar">
-        <server-template id="ConsultantAuxiliarServer">
+    <application name="ConsultantServer">
+        <server-template id="ConsultantServer">
 
             <parameter name="worker_id"/>
             <parameter name="master_id"/>
@@ -25,21 +25,21 @@
 
     <node name="Node3">
         <server-instance template="ConsultantAuxiliarServer" index="1" 
-            worker_id="1" master_id="1" subscriber_endpoints="tcp -h 10.147.19.147 -p 12001"/>
+            worker_id="1" master_id="1" subscriber_endpoints="tcp -h 10.147.19.147 -p 12001:udp -h 10.147.19.147 -p 12002"/>
     </node>
 
     <node name="Node4">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="2" master_id="1" subscriber_endpoints="tcp -h 10.147.19.230 -p 12002"/>
+            worker_id="2" master_id="1" subscriber_endpoints="tcp -h 10.147.19.230 -p 12003:udp -h 10.147.19.230 -p 12004"/>
     </node>
 
     <node name="Node5">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.139 -p 12003"/>
+            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.139 -p 12005:udp -h 10.147.19.139 -p 12006"/>
     </node>
 
     <node name="Node6">
         <server-instance template="ConsultantAuxiliarServer"
-            worker_id="4" master_id="2" subscriber_endpoints="tcp -h 10.147.19.137 -p 12004"/>
+            worker_id="4" master_id="2" subscriber_endpoints="tcp -h 10.147.19.137 -p 12007:udp -h 10.147.19.137 -p 12008"/>
     </node>
 </icegrid>

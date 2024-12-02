@@ -23,7 +23,7 @@ IceMX.Metrics.ByParent.GroupBy=parent
 # --------------------------------------------------------
 # Client configuration
 
-TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000
+TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000    
 
 # Server Location. It goes where the master is
 # Ice.Default.Host=

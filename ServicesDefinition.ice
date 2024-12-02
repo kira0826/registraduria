@@ -24,29 +24,6 @@ module RegistryModule
 
     }
 
-    //Consultant auxiliar
-
-    interface MathPrimes{
-
-        int calculatePrime(int id);
-
-    }
-
-    interface ConsultantManager{
-
-
-        void performQuery(StringSeq ids, Callback* callback);
-
-    }
-
-    interface ConsultantAuxiliarManager{
-
-        void shutdown();
-
-        void launch();  
-
-    }
-
     //Proxypool connection 
 
     interface PerformQuery{
@@ -73,6 +50,29 @@ module RegistryModule
         void addPartialResult(string result);
         
         Task getTask();
+    }
+
+    //Consultant auxiliar
+
+    interface MathPrimes{
+
+        int calculatePrime(int id);
+
+    }
+
+    interface ConsultantManager{
+
+
+        void performQuery(StringSeq ids, Callback* callback);
+
+    }
+
+    interface ConsultantAuxiliarManager{
+
+        void shutdown();
+
+        void launch(TaskManager* taskManager);  
+
     }
 
 }

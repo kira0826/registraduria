@@ -18,7 +18,6 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         this.dataSource = dataSource;
     }
 
-    
     private String executeQuery(String query, Current current) {
         StringBuilder resultBuilder = new StringBuilder();
 
@@ -43,7 +42,6 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         return resultBuilder.toString();
     }
 
-    
     private String makeQuery(String[] ids, Current current) {
         StringJoiner placeholders = new StringJoiner(",");
         for (String id : ids) {
@@ -51,18 +49,17 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         }
 
         String sql = "SELECT\n" +
-        "    ciudadano.documento,\n" +
-        "    departamento.nombre AS departamento_nombre,\n" +
-        "    municipio.nombre AS municipio_nombre,\n" +
-        "    puesto_votacion.nombre AS puesto_votacion_nombre,\n" +
-        "    mesa_votacion.consecutive AS mesa_votacion_consecutive\n" +
-        "FROM ciudadano\n" +
-        "JOIN mesa_votacion ON ciudadano.mesa_id = mesa_votacion.id\n" +
-        "JOIN puesto_votacion ON mesa_votacion.puesto_id = puesto_votacion.id\n" +
-        "JOIN municipio ON puesto_votacion.municipio_id = municipio.id\n" +
-        "JOIN departamento ON municipio.departamento_id = departamento.id\n" +
-        "WHERE ciudadano.documento IN (%s);";
-
+                "    ciudadano.documento,\n" +
+                "    departamento.nombre AS departamento_nombre,\n" +
+                "    municipio.nombre AS municipio_nombre,\n" +
+                "    puesto_votacion.nombre AS puesto_votacion_nombre,\n" +
+                "    mesa_votacion.consecutive AS mesa_votacion_consecutive\n" +
+                "FROM ciudadano\n" +
+                "JOIN mesa_votacion ON ciudadano.mesa_id = mesa_votacion.id\n" +
+                "JOIN puesto_votacion ON mesa_votacion.puesto_id = puesto_votacion.id\n" +
+                "JOIN municipio ON puesto_votacion.municipio_id = municipio.id\n" +
+                "JOIN departamento ON municipio.departamento_id = departamento.id\n" +
+                "WHERE ciudadano.documento IN (%s);";
 
         return String.format(sql, placeholders.toString());
     }

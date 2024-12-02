@@ -43,19 +43,11 @@ subprojects {
         // Configure manifest
         manifest {
             attributes(
-                'Main-Class': project.name.capitalize(),  // Uses the capitalized project name
-                'Class-Path': '/opt/Ice-3.7.6/lib/ice-3.7.6.jar'
+                "Main-Class" : project.name.capitalize(),
+                "Class-Path": configurations.runtimeClasspath.resolve().collect {
+                it.toURI() }.join(' ')
+//                    "Class-Path": '/opt/Ice-3.7.6/lib/ice-3.7.6.jar /usr/share/java/icestorm-3.7.10.jar'
             )
         }
-
-        // Merge service files if needed
-        mergeServiceFiles()
     }
-
-    jar {
-        enabled = false  
-    }
-
-    // Make sure shadowJar runs as part of the build
-    build.dependsOn shadowJar
 }

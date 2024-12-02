@@ -1,6 +1,5 @@
 import java.util.stream.Collectors;
 
-
 import com.zeroc.Ice.*;
 import com.zeroc.IceStorm.TopicManagerPrx;
 import com.zeroc.IceStorm.TopicPrx;
@@ -18,7 +17,6 @@ public class ConsultantServer {
         this.masterId = masterId;
     }
 
-    
     public static void main(String[] args) {
         for (String arg : args) {
             System.out.println("arg " + arg);
@@ -40,11 +38,11 @@ public class ConsultantServer {
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
             adapter.activate();
             // Create ConsultantServiceManager
-
-            com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator.createObjectAdapter("ConsultantServiceManager");
+            com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator
+                    .createObjectAdapter("ConsultantServiceManager");
             com.zeroc.Ice.Properties properties = communicator.getProperties();
             com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
-            consultantServerManagerAdapter.add(new ConsultantServiceManager(), id);
+            consultantServerManagerAdapter.add(new ConsultantServiceManagerImpl(), id);
             consultantServerManagerAdapter.activate();
 
             int status = publisher.run(communicator, destroyHook, taskManagerPrx);
@@ -108,10 +106,10 @@ public class ConsultantServer {
                     generalTopic.getPublisher().ice_oneway());
             generalWorker.setPoolSize(poolSize);
             System.out.println("Publishing events. Press ^C to terminate the application.");
-            if(taskManager.getRemainingTasks()==1){
+            if (taskManager.getRemainingTasks() == 1) {
                 privateWorker.launch(taskManager);
-            }else{
-                while (taskManager.getRemainingTasks()>0) {
+            } else {
+                while (taskManager.getRemainingTasks() > 0) {
                     generalWorker.launch(taskManager);
                     try {
                         Thread.sleep(1000);
@@ -146,6 +144,5 @@ public class ConsultantServer {
         }
         return null;
     }
-
 
 }

@@ -9,12 +9,11 @@ public class ProxyPoolConnection {
     public static void main(String[] args) {
 
         System.out.println("Ola");
-        
+
         try (Communicator communicator = Util.initialize(args)) {
             // Imprimir las propiedades recibidas
             Properties properties = communicator.getProperties();
 
-            
             System.out.println("Propiedades recibidas:");
             for (String key : properties.getPropertiesForPrefix("").keySet()) {
                 System.out.println(key + " = " + properties.getProperty(key));
@@ -43,14 +42,12 @@ public class ProxyPoolConnection {
 
             communicator.waitForShutdown();
 
-            
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            //DatabaseConfig.close();
+            // DatabaseConfig.close();
             System.out.println("Conexión cerrada");
         }
-             
 
     }
 }

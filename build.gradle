@@ -17,20 +17,25 @@ subprojects {
 
     repositories {
         mavenCentral()
+        maven {
+            url "https://repo.zeroc.com/nexus/content/repositories/releases"
+        }
+        maven {
+            url "https://repo.zeroc.com/nexus/content/repositories/thirdparty"
+        }
     }
 
     dependencies {
         implementation 'com.zeroc:ice:3.7.6'
         implementation 'com.zeroc:icestorm:3.7.10'
+        implementation 'com.zeroc:icegrid:3.7.6'
         implementation 'com.zaxxer:HikariCP:6.2.1'
         implementation 'org.postgresql:postgresql:42.7.4'
         implementation 'org.slf4j:slf4j-api:1.6.1'
-        runtimeOnly 'com.zeroc:icegrid:3.7.10'
         implementation 'ch.qos.logback:logback-classic:1.2.11'
-        implementation 'com.zeroc:icegrid:3.7.6' 
         runtimeOnly 'com.zeroc:icelocatordiscovery:3.7.6'
-        runtimeOnly 'org.apache.commons:commons-compress:1.14'
-        
+        implementation fileTree(dir: 'libs', include: ['*.jar'])
+
         configurations.all {
             exclude group: 'org.slf4j', module: 'slf4j-simple'
         }

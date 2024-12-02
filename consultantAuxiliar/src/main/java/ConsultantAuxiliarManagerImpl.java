@@ -1,4 +1,5 @@
 import RegistryModule.ConsultantAuxiliarManager;
+import RegistryModule.PerformQueryPrx;
 import RegistryModule.Task;
 import com.zeroc.Ice.Current;
 import com.zeroc.Ice.Value;
@@ -8,12 +9,20 @@ import RegistryModule.TaskManagerPrx;
 import java.util.concurrent.*;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
+
+    PerformQueryPrx performQuery;
+
+    public ConsultantAuxiliarManagerImpl(PerformQueryPrx performQuery) {
+        this.performQuery = performQuery;
+    }
+
     private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
             4,
             8,
             60, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>()
-    );    @Override
+            new LinkedBlockingQueue<>());
+
+    @Override
     public void shutdown(Current current) {
         // Implementar logia para verificar a que topics estoy suscrito y mirar si puedo
         // apagarme
@@ -41,7 +50,7 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
                     try {
                         Thread.currentThread();
                         Thread.sleep(500);
-                    }catch(InterruptedException e){
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     String result = processTask(task);
@@ -56,7 +65,7 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
         });
     }
 
-    private String processTask(Task task){
+    private String processTask(Task task) {
         return "Tarea procesada";
     }
 

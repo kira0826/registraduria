@@ -30,7 +30,7 @@
 
     <node name="Node4">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="2" master_id="1" subscriber_endpoints="tcp -h 10.147.19.230 -p 12002"/>
+            worker_id="2" master_id="2" subscriber_endpoints="tcp -h 10.147.19.230 -p 12002"/>
     </node>
 
     <node name="Node5">

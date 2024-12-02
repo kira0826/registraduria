@@ -9,12 +9,13 @@ import java.util.stream.Collectors;
 
 public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantServiceManager {
 
-    public ConsultantServiceManagerImpl(Communicator communicator, TaskManagerPrx taskManager, String masterId){
+    public ConsultantServiceManagerImpl(Communicator communicator, TaskManagerPrx taskManager, String masterId) {
         this.poolSize = 8;
         this.communicator = communicator;
         this.taskManager = taskManager;
         this.masterId = masterId;
     }
+
     private int poolSize;
     private Communicator communicator;
     private TaskManagerPrx taskManager;
@@ -61,16 +62,16 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
             generalWorker.setPoolSize(poolSize);
             System.out.println("Publishing events. Press ^C to terminate the application.");
             long startTime = System.currentTimeMillis();
-            if(taskManager.getRemainingTasks()==1){
+            if (taskManager.getRemainingTasks() == 1) {
                 privateWorker.launch(taskManager);
-            }else{
-                while (taskManager.getRemainingTasks()>0) {
+            } else {
+                while (taskManager.getRemainingTasks() > 0) {
                     generalWorker.launch(taskManager);
                 }
             }
             long endTime = System.currentTimeMillis();
-            long totalTime = endTime-startTime;
-            callbackPrx.reportResponse(new Response(totalTime ,taskManager.getResult()));
+            long totalTime = endTime - startTime;
+            callbackPrx.reportResponse(new Response(totalTime, taskManager.getResult()));
             taskManager.shutdown();
             return 0;
         } catch (LocalException e) {

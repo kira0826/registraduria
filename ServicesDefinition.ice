@@ -41,34 +41,30 @@ module RegistryModule
 
         StringSeq ids;
 
-        string hostname;
+        string id;
 
     }
 
     interface TaskManager{
 
-        void addPartialResult(string result);
-        
+        void addPartialResult(string result, string taskId);
+
+        int getRemainingTasks();
+
         Task getTask();
+
+        void shutdown();
+
+        string getResult();
     }
 
     //Consultant auxiliar
 
-    interface MathPrimes{
-
-        int calculatePrime(int id);
-
-    }
-
-    interface ConsultantManager{
-
-        void performQuery(StringSeq ids, Callback* callback);
-
-    }
-
     interface ConsultantAuxiliarManager{
 
         void shutdown();
+
+        void setPoolSize(int n);
 
         void launch(TaskManager* taskManager);  
 

@@ -22,6 +22,6 @@
         <server-instance template="ProxyPoolConnectionServer" index="1" host="10.147.19.85" dbHost="xhgrid3"/>
     </node>
     <node name="Node2">
-        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" dbHost="xhgrid4"/>
+        <server-instance template="ProxyPoolConnectionServer" index="2" host="10.147.19.239" dbHost="xgrid14"/>
     </node>
 </icegrid>

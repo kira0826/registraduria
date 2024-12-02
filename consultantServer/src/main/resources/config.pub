@@ -25,5 +25,5 @@ IceMX.Metrics.ByParent.GroupBy=parent
 # Server configuration
 
 TaskManager.Endpoints=tcp -p 30002
-Ice.Default.Host=localhost
+# Ice.Default.Host=localhost
 Ice.ThreadPool.Server.Size=4

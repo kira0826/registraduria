@@ -6,7 +6,7 @@
 #
 Auxiliar.Subscriber.Endpoints=tcp -h localhost -p 0:udp -h localhost -p 0
 
-
+asd
 #
 # This property is used by the clients to connect to IceStorm. It goes to iceStorm endpoints
 #

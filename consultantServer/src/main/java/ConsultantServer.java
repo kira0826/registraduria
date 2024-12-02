@@ -1,4 +1,8 @@
+import com.zeroc.Ice.ObjectPrx;
+
 import RegistryModule.ConsultantAuxiliarManagerPrx;
+import RegistryModule.TaskManager;
+import RegistryModule.TaskManagerPrx;
 
 public class ConsultantServer {
     public static void main(String[] args) {
@@ -14,13 +18,17 @@ public class ConsultantServer {
 
             // Create an object adapter and start the master server logic
             com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("TaskManager");
-            adapter.add(new TaskManagerImpl(), com.zeroc.Ice.Util.stringToIdentity("SimpleTaskManager"));
+
+            TaskManager taskManager = new TaskManagerImpl();
+            ObjectPrx prx = adapter.add(taskManager, com.zeroc.Ice.Util.stringToIdentity("SimpleTaskManager"));
+            TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
+
             adapter.activate();
 
             // Install shutdown hook
             Runtime.getRuntime().addShutdownHook(new Thread(() -> communicator.destroy()));
             // Activate the publisher logic
-            status = run(communicator, extraArgs.toArray(new String[extraArgs.size()]));
+            status = run(communicator, extraArgs.toArray(new String[extraArgs.size()]), taskManagerPrx);
             communicator.waitForShutdown();
         }
         System.exit(status);
@@ -32,7 +40,7 @@ public class ConsultantServer {
         System.out.println("Usage: [--datagram|--twoway|--oneway] [topic]");
     }
 
-    private static int run(com.zeroc.Ice.Communicator communicator, String[] args) {
+    private static int run(com.zeroc.Ice.Communicator communicator, String[] args, TaskManagerPrx taskManager) {
         String option = "None";
         String topicName = "master";
         int i;
@@ -106,7 +114,7 @@ public class ConsultantServer {
 
             while (true) {
 
-                worker.launch();
+                worker.launch(taskManager);
 
                 try {
                     Thread.currentThread();

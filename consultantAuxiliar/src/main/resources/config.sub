@@ -2,14 +2,15 @@
 # This property is used to configure the endpoints of the clock
 # subscriber adapter. These endpoints are where the client receives
 # topic messages from IceStorm.
+# It goes where the worker (subscriber) is to expose its endpoints (It should be dynamic)
 #
-Auxiliar.Subscriber.Endpoints=tcp -h hgrid4 -p 0:udp -h hgrid4 -p 0
+Auxiliar.Subscriber.Endpoints=tcp -h localhost -p 0:udp -h localhost -p 0
 
 
 #
-# This property is used by the clients to connect to IceStorm.
+# This property is used by the clients to connect to IceStorm. It goes to iceStorm endpoints
 #
-TopicManager.Proxy=DemoIceStorm/TopicManager:default -h hgrid2 -p 10000
+TopicManager.Proxy=DemoIceStorm/TopicManager:default -h localhost -p 10000
 
 #
 # IceMX configuration.
@@ -24,8 +25,8 @@ IceMX.Metrics.ByParent.GroupBy=parent
 
 TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000
 
-# Server Location
-Ice.Default.Host=10.147.19.108
+# Server Location. It goes where the master is
+# Ice.Default.Host=
 
 # Threadpool
 Ice.ThreadPool.Server.Size=4

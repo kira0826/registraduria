@@ -1,201 +1,246 @@
-import RegistryModule.Task;
-import RegistryModule.TaskManager;
-import RegistryModule.TaskManagerPrx;
+import com.zeroc.Ice.*;
+import com.zeroc.IceStorm.AlreadySubscribed;
+import com.zeroc.IceStorm.BadQoS;
+import com.zeroc.IceStorm.InvalidSubscriber;
+import com.zeroc.IceStorm.NoSuchTopic;
+import com.zeroc.IceStorm.TopicManagerPrx;
+import com.zeroc.IceStorm.TopicPrx;
 
 public class ConsultantAuxiliar {
+
+    private final String workerId;
+    private final String masterId;
+
+    public ConsultantAuxiliar(String workerId, String masterId) {
+        this.workerId = workerId;
+        this.masterId = masterId;
+    }
+
     public static void main(String[] args) {
-        int status = 0;
-        java.util.List<String> extraArgs = new java.util.ArrayList<String>();
 
-        com.zeroc.Ice.Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.sub", extraArgs);
-        // Set the package for generated classes
-        communicator.getProperties().setProperty("Ice.Default.Package", "Demo");
-
-        TaskManagerPrx taskManager = TaskManagerPrx
-                .checkedCast(communicator.propertyToProxy("TaskManager.Proxy"));
-
-        // Destroy communicator during JVM shutdown
-        Thread destroyHook = new Thread(() -> communicator.destroy());
-        Runtime.getRuntime().addShutdownHook(destroyHook);
-
-        try {
-            status = run(communicator, destroyHook, extraArgs.toArray(new String[extraArgs.size()]), taskManager);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            status = 1;
+        for (String arg : args) {
+            System.out.println("arg " + arg);
         }
 
-        if (status != 0) {
+        try (com.zeroc.Ice.Communicator communicator = initializeCommunicator(args)) {
+            // Obtener IDs desde argumentos o propiedades
+            String workerId = getProperty(communicator, "Worker.ID", "worker1");
+            String masterId = getProperty(communicator, "Master.ID", "master1");
+
+            System.out.println("Worker ID: " + workerId);
+            System.out.println("Master ID: " + masterId);
+
+            ConsultantAuxiliar consultant = new ConsultantAuxiliar(workerId, masterId);
+            Thread destroyHook = new Thread(() -> communicator.destroy());
+            Runtime.getRuntime().addShutdownHook(destroyHook);
+            // int status = consultant.run(communicator, destroyHook);
+            int status = consultant.run(communicator);
             System.exit(status);
+        } catch (LocalException e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+
     }
 
-    public static void usage() {
-        System.out.println("Usage: [--batch] [--datagram|--twoway|--ordered|--oneway] " +
-                "[--retryCount count] [--id id] [topic]");
+    private static String getProperty(Communicator communicator, String key, String defaultValue) {
+        String value = communicator.getProperties().getProperty(key);
+        return value.isEmpty() ? defaultValue : value;
     }
 
-    private static int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook, String[] args,
-            TaskManagerPrx taskManager) {
-        args = communicator.getProperties().parseCommandLineOptions("Clock", args);
-
-        String topicName = "master";
-        String option = "None";
-        boolean batch = false;
-        String id = null;
-        String retryCount = null;
-        int i;
-        for (i = 0; i < args.length; ++i) {
-            String oldoption = option;
-            if (args[i].equals("--datagram")) {
-                option = "Datagram";
-            } else if (args[i].equals("--twoway")) {
-                option = "Twoway";
-            } else if (args[i].equals("--ordered")) {
-                option = "Ordered";
-            } else if (args[i].equals("--oneway")) {
-                option = "Oneway";
-            } else if (args[i].equals("--batch")) {
-                batch = true;
-            } else if (args[i].equals("--id")) {
-                ++i;
-                if (i >= args.length) {
-                    usage();
-                    return 1;
-                }
-                id = args[i];
-            } else if (args[i].equals("--retryCount")) {
-                ++i;
-                if (i >= args.length) {
-                    usage();
-                    return 1;
-                }
-                retryCount = args[i];
-            } else if (args[i].startsWith("--")) {
-                usage();
-                return 1;
-            } else {
-                topicName = args[i++];
-                break;
-            }
-
-            if (!oldoption.equals(option) && !oldoption.equals("None")) {
-                usage();
-                return 1;
-            }
-        }
-
-        if (i != args.length) {
-            usage();
-            return 1;
-        }
-
-        if (batch && (option.equals("Twoway") || option.equals("Ordered"))) {
-            System.err.println("batch can only be set with oneway or datagram");
-            return 1;
-        }
-
-        com.zeroc.IceStorm.TopicManagerPrx manager = com.zeroc.IceStorm.TopicManagerPrx.checkedCast(
-                communicator.propertyToProxy("TopicManager.Proxy"));
-        if (manager == null) {
-            System.err.println("invalid proxy");
-            return 1;
-        }
-
-        //
-        // Retrieve the topic.
-        //
-        com.zeroc.IceStorm.TopicPrx topic;
+    private static com.zeroc.Ice.Communicator initializeCommunicator(String[] args) {
         try {
-            topic = manager.retrieve(topicName);
+            // Inicializar propiedades
+            InitializationData initData = new InitializationData();
+            initData.properties = Util.createProperties();
+
+            // Cargar archivo de configuración desde el JAR
+            initData.properties.load("config.sub");
+
+            // Permitir sobrescribir propiedades desde línea de comandos
+            args = initData.properties.parseCommandLineOptions("Worker", args);
+
+            return Util.initialize(args, initData);
+        } catch (LocalException e) {
+            System.err.println("Error initializing Ice: " + e.getMessage());
+            System.exit(1);
+            return null;
+        }
+
+        // java.util.List<String> extraArgs = new java.util.ArrayList<String>();
+        // try (com.zeroc.Ice.Communicator communicator =
+        // com.zeroc.Ice.Util.initialize(args, "config.sub", extraArgs)) {
+        // // Destroy communicator during JVM shutdown
+
+        // return communicator;
+        // } catch (LocalException e) {
+        // e.printStackTrace();
+        // return null;
+        // }
+    }
+
+    private int run(com.zeroc.Ice.Communicator communicator) {
+        try {
+            TopicManagerPrx manager = TopicManagerPrx.checkedCast(
+                    communicator.propertyToProxy("TopicManager.Proxy"));
+
+            // Crear/obtener topic específico master-worker
+            String privateTopicName = String.format("master.%s.%s", masterId, workerId);
+            TopicPrx privateTopic = getOrCreateTopic(manager, privateTopicName);
+
+            // Crear/obtener topic general
+            String generalTopicName = "general.tasks";
+            TopicPrx generalTopic = getOrCreateTopic(manager, generalTopicName);
+
+            // Crear el adapter y el servant
+            ObjectAdapter adapter = communicator.createObjectAdapter("Worker.Subscriber");
+            ConsultantAuxiliarManagerImpl servant = new ConsultantAuxiliarManagerImpl();
+
+            // Suscribirse al topic privado
+            Identity privateId = new Identity(workerId + ".private", "worker");
+            ObjectPrx privateSubscriber = adapter.add(servant, privateId);
+            subscribeToTopic(privateTopic, privateSubscriber, true); // QoS ordenado para mensajes privados
+
+            // Suscribirse al topic general
+            Identity generalId = new Identity(workerId + ".general", "worker");
+            ObjectPrx generalSubscriber = adapter.add(servant, generalId);
+            subscribeToTopic(generalTopic, generalSubscriber, false); // QoS estándar para mensajes generales
+
+            adapter.activate();
+
+            // Configurar shutdown hooks para ambas suscripciones
+            setupShutdownHook(privateTopic, privateSubscriber, generalTopic, generalSubscriber, communicator);
+
+            communicator.waitForShutdown();
+            return 0;
+
+        } catch (LocalException e) {
+            e.printStackTrace();
+            return 1;
+        }
+    }
+
+    private TopicPrx getOrCreateTopic(TopicManagerPrx manager, String topicName) {
+        try {
+            return manager.retrieve(topicName);
         } catch (com.zeroc.IceStorm.NoSuchTopic e) {
             try {
-                topic = manager.create(topicName);
+                return manager.create(topicName);
             } catch (com.zeroc.IceStorm.TopicExists ex) {
-                System.err.println("temporary failure, try again.");
-                return 1;
+                try {
+                    return manager.retrieve(topicName);
+                } catch (NoSuchTopic e1) {
+                    e1.printStackTrace();
+                }
             }
         }
+        return null;
+    }
 
-        com.zeroc.Ice.ObjectAdapter adapter = communicator.createObjectAdapter("Auxiliar.Subscriber");
-
-        //
-        // Add a servant for the Ice object. If --id is used the
-        // identity comes from the command line, otherwise a UUID is
-        // used.
-        //
-        // id is not directly altered since it is used below to detect
-        // whether subscribeAndGetPublisher can raise
-        // AlreadySubscribed.
-        //
-        com.zeroc.Ice.Identity subId = new com.zeroc.Ice.Identity(id, "");
-        if (subId.name == null) {
-            subId.name = java.util.UUID.randomUUID().toString();
-        }
-        com.zeroc.Ice.ObjectPrx subscriber = adapter.add(new ConsultantAuxiliarManagerImpl(), subId);
-
-        //
-        // Activate the object adapter before subscribing.
-        //
-        adapter.activate();
-
+    private void subscribeToTopic(TopicPrx topic, ObjectPrx subscriber, boolean ordered) {
         java.util.Map<String, String> qos = new java.util.HashMap<>();
-        if (retryCount != null) {
-            qos.put("retryCount", retryCount);
-        }
-        //
-        // Set up the proxy.
-        //
-        if (option.equals("Datagram")) {
-            if (batch) {
-                subscriber = subscriber.ice_batchDatagram();
-            } else {
-                subscriber = subscriber.ice_datagram();
-            }
-        } else if (option.equals("Twoway")) {
-            // Do nothing to the subscriber proxy. Its already twoway.
-        } else if (option.equals("Ordered")) {
-            // Do nothing to the subscriber proxy. Its already twoway.
+        if (ordered) {
             qos.put("reliability", "ordered");
-        } else if (option.equals("Oneway") || option.equals("None")) {
-            if (batch) {
-                subscriber = subscriber.ice_batchOneway();
-            } else {
-                subscriber = subscriber.ice_oneway();
-            }
         }
-
         try {
             topic.subscribeAndGetPublisher(qos, subscriber);
-        } catch (com.zeroc.IceStorm.AlreadySubscribed e) {
-            // This should never occur when subscribing with an UUID
-            if (id == null) {
-                e.printStackTrace();
-                return 1;
-            }
+        } catch (AlreadySubscribed e) {
+            e.printStackTrace();
             System.out.println("reactivating persistent subscriber");
-        } catch (com.zeroc.IceStorm.InvalidSubscriber e) {
+            return;
+        } catch (InvalidSubscriber e) {
             e.printStackTrace();
-            return 1;
-        } catch (com.zeroc.IceStorm.BadQoS e) {
+            return;
+        } catch (BadQoS e) {
             e.printStackTrace();
-            return 1;
+            return;
         }
+    }
 
-        //
-        // Replace the shutdown hook to unsubscribe during JVM shutdown
-        //
-        final com.zeroc.IceStorm.TopicPrx topicF = topic;
-        final com.zeroc.Ice.ObjectPrx subscriberF = subscriber;
+    private void setupShutdownHook(TopicPrx privateTopic, ObjectPrx privateSubscriber,
+            TopicPrx generalTopic, ObjectPrx generalSubscriber,
+            Communicator communicator) {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                topicF.unsubscribe(subscriberF);
+                privateTopic.unsubscribe(privateSubscriber);
+                generalTopic.unsubscribe(generalSubscriber);
             } finally {
                 communicator.destroy();
             }
         }));
-        Runtime.getRuntime().removeShutdownHook(destroyHook); // remove old destroy-only shutdown hook
-
-        return 0;
     }
+
+    // private int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook)
+    // {
+
+    // System.out.println("Running the worker");
+    // System.out.println("Inside run Worker ID: " + workerId);
+    // System.out.println("Inside run Master ID: " + masterId);
+
+    // try {
+    // // Obtener el TopicManager
+    // TopicManagerPrx manager = TopicManagerPrx.checkedCast(
+    // communicator.propertyToProxy("TopicManager.Proxy"));
+    // if (manager == null) {
+    // System.err.println("Invalid proxy");
+    // return 1;
+    // }
+
+    // // Obtener o crear el topic
+    // String topicName = "master";
+    // TopicPrx topic;
+    // try {
+    // topic = manager.retrieve(topicName);
+    // } catch (com.zeroc.IceStorm.NoSuchTopic e) {
+    // try {
+    // topic = manager.create(topicName);
+    // } catch (com.zeroc.IceStorm.TopicExists ex) {
+    // System.err.println("Topic exists, try again.");
+    // return 1;
+    // }
+    // }
+
+    // // Crear el adapter y añadir el servant
+    // ObjectAdapter adapter =
+    // communicator.createObjectAdapter("Auxiliar.Subscriber");
+    // Identity subscriberId = new Identity(
+    // java.util.UUID.randomUUID().toString(), "");
+    // ObjectPrx subscriber = adapter.add(new ConsultantAuxiliarManagerImpl(),
+    // subscriberId);
+
+    // // Activar el adapter
+    // adapter.activate();
+
+    // // Suscribirse al topic
+    // java.util.Map<String, String> qos = new java.util.HashMap<>();
+    // topic.subscribeAndGetPublisher(qos, subscriber);
+
+    // // Configurar el shutdown hook para desuscribirse
+    // final com.zeroc.IceStorm.TopicPrx topicF = topic;
+    // final com.zeroc.Ice.ObjectPrx subscriberF = subscriber;
+    // Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+    // try {
+    // topicF.unsubscribe(subscriberF);
+    // } finally {
+    // communicator.destroy();
+    // }
+    // }));
+    // Runtime.getRuntime().removeShutdownHook(destroyHook); // remove old
+    // destroy-only shutdown hook
+    // communicator.waitForShutdown();
+    // return 0;
+
+    // // Esperar hasta que la aplicación se cierre
+    // } catch (AlreadySubscribed e) {
+    // e.printStackTrace();
+    // System.out.println("reactivating persistent subscriber");
+    // return 1;
+    // } catch (InvalidSubscriber e) {
+    // e.printStackTrace();
+    // return 1;
+    // } catch (BadQoS e) {
+    // e.printStackTrace();
+    // return 1;
+    // }
+    // }
 }

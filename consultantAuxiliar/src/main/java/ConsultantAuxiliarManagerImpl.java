@@ -2,6 +2,7 @@ import RegistryModule.ConsultantAuxiliarManager;
 import RegistryModule.PerformQueryPrx;
 import RegistryModule.Task;
 import com.zeroc.Ice.Current;
+import com.zeroc.Ice.ObjectAdapter;
 import com.zeroc.Ice.Value;
 
 import RegistryModule.TaskManagerPrx;
@@ -47,12 +48,6 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
             try {
                 Task task = taskManager.getTask();
                 if (task != null) {
-                    try {
-                        Thread.currentThread();
-                        Thread.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                     String result = processTask(task);
                     taskManager.addPartialResult(result, task.id);
                     System.out.println("Task completed: " + task.id);

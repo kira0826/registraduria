@@ -9,12 +9,8 @@ import RegistryModule.TaskManager;
 import RegistryModule.TaskManagerPrx;
 
 public class ConsultantServer {
-    private final String masterId;
-    private int poolSize = 8;
-    private static final String path = "cedulas.txt";
 
     public ConsultantServer(String masterId) {
-        this.masterId = masterId;
     }
 
     public static void main(String[] args) {
@@ -27,13 +23,12 @@ public class ConsultantServer {
 
             System.out.println("Master ID: " + masterId);
 
-            ConsultantServer publisher = new ConsultantServer(masterId);
             Thread destroyHook = new Thread(() -> communicator.destroy());
             Runtime.getRuntime().addShutdownHook(destroyHook);
 
             // Create TaskManager
             ObjectAdapter adapter = communicator.createObjectAdapter("TaskManager");
-            TaskManager taskManager = new TaskManagerImpl(path);
+            TaskManager taskManager = new TaskManagerImpl();
             ObjectPrx prx = adapter.add(taskManager, Util.stringToIdentity("SimpleTaskManager"));
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
             adapter.activate();
@@ -42,11 +37,9 @@ public class ConsultantServer {
                     .createObjectAdapter("ConsultantServiceManager");
             com.zeroc.Ice.Properties properties = communicator.getProperties();
             com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
-            consultantServerManagerAdapter.add(new ConsultantServiceManagerImpl(), id);
+            consultantServerManagerAdapter.add(new ConsultantServiceManagerImpl(communicator, taskManagerPrx, masterId), id);
             consultantServerManagerAdapter.activate();
-
-            int status = publisher.run(communicator, destroyHook, taskManagerPrx);
-            System.exit(status);
+            communicator.waitForShutdown();
         } catch (LocalException e) {
             e.printStackTrace();
             System.exit(1);
@@ -74,75 +67,4 @@ public class ConsultantServer {
             return null;
         }
     }
-
-    private int run(Communicator communicator, Thread destroyHook, TaskManagerPrx taskManager) {
-        System.out.println("Properties: " + communicator.getProperties().getPropertiesForPrefix("").entrySet().stream()
-                .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(", ")));
-
-        try {
-            TopicManagerPrx manager = TopicManagerPrx.checkedCast(
-                    communicator.propertyToProxy("TopicManager.Proxy"));
-
-            if (manager == null) {
-                System.err.println("invalid proxy");
-                return 1;
-            }
-
-            // Obtener/crear topic específico master-worker (para el worker específico)
-            String privateTopicName = String.format("%s.%s", masterId,
-                    getProperty(communicator, "Worker.ID", "worker1"));
-            System.out.println("Private topic: " + privateTopicName);
-            TopicPrx privateTopic = getOrCreateTopic(manager, privateTopicName);
-
-            // Obtener/crear topic general
-            String generalTopicName = "general.tasks";
-            System.out.println("General topic: " + generalTopicName);
-            TopicPrx generalTopic = getOrCreateTopic(manager, generalTopicName);
-
-            // Obtener publishers para ambos topics
-            ConsultantAuxiliarManagerPrx privateWorker = ConsultantAuxiliarManagerPrx.uncheckedCast(
-                    privateTopic.getPublisher().ice_oneway());
-            ConsultantAuxiliarManagerPrx generalWorker = ConsultantAuxiliarManagerPrx.uncheckedCast(
-                    generalTopic.getPublisher().ice_oneway());
-            generalWorker.setPoolSize(poolSize);
-            System.out.println("Publishing events. Press ^C to terminate the application.");
-            if (taskManager.getRemainingTasks() == 1) {
-                privateWorker.launch(taskManager);
-            } else {
-                while (taskManager.getRemainingTasks() > 0) {
-                    generalWorker.launch(taskManager);
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                }
-            }
-            taskManager.shutdown();
-            System.out.println("Resultado:");
-            System.out.println(taskManager.getResult());
-            return 0;
-        } catch (LocalException e) {
-            e.printStackTrace();
-            return 1;
-        }
-    }
-
-    private TopicPrx getOrCreateTopic(TopicManagerPrx manager, String topicName) {
-        try {
-            return manager.retrieve(topicName);
-        } catch (com.zeroc.IceStorm.NoSuchTopic e) {
-            try {
-                return manager.create(topicName);
-            } catch (com.zeroc.IceStorm.TopicExists ex) {
-                try {
-                    return manager.retrieve(topicName);
-                } catch (com.zeroc.IceStorm.NoSuchTopic e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        return null;
-    }
-
 }

@@ -1,5 +1,6 @@
 import java.util.stream.Collectors;
 
+
 import com.zeroc.Ice.*;
 import com.zeroc.IceStorm.TopicManagerPrx;
 import com.zeroc.IceStorm.TopicPrx;
@@ -8,7 +9,7 @@ import RegistryModule.ConsultantAuxiliarManagerPrx;
 import RegistryModule.TaskManager;
 import RegistryModule.TaskManagerPrx;
 
-public class ConsultantServer implements RegistryModule.ConsultantServer {
+public class ConsultantServer {
     private final String masterId;
     private int poolSize = 8;
     private static final String path = "cedulas.txt";
@@ -37,8 +38,14 @@ public class ConsultantServer implements RegistryModule.ConsultantServer {
             TaskManager taskManager = new TaskManagerImpl(path);
             ObjectPrx prx = adapter.add(taskManager, Util.stringToIdentity("SimpleTaskManager"));
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
-
             adapter.activate();
+            // Create ConsultantServiceManager
+
+            com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator.createObjectAdapter("ConsultantServiceManager");
+            com.zeroc.Ice.Properties properties = communicator.getProperties();
+            com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
+            consultantServerManagerAdapter.add(new ConsultantServiceManager(), id);
+            consultantServerManagerAdapter.activate();
 
             int status = publisher.run(communicator, destroyHook, taskManagerPrx);
             System.exit(status);
@@ -140,13 +147,5 @@ public class ConsultantServer implements RegistryModule.ConsultantServer {
         return null;
     }
 
-    @Override
-    public void setPoolsize(int n, Current current) {
-        this.poolSize = n;
-    }
 
-    @Override
-    public void searchDocumentsByPath(String path, Current current) {
-
-    }
 }

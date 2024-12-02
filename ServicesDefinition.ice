@@ -71,7 +71,7 @@ module RegistryModule
 
     }
 
-    interface ConsultantServer{
+    interface ConsultantServiceManager{
 
         void setPoolsize(int n);
         void searchDocumentsByPath(string path);

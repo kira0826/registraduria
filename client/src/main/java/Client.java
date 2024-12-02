@@ -12,16 +12,10 @@ public class Client {
 
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        List<String> extraArgs = new ArrayList<>();
+        int status = 0;
         try {
-            List<String> extraArgs = new ArrayList<>();
             Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs);
-
-
-            ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback","tcp -h 0.0.0.0");
-            com.zeroc.Ice.Object clientCallback = new CallbackI();
-            ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
-            CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
-            adapter.activate();
 
             System.out.println("Bienvenido al sistema de votaciones");
 
@@ -48,20 +42,39 @@ public class Client {
 
                 if (input.equalsIgnoreCase("exit")) {
                     System.out.println("Saliendo del sistema...");
+                    System.exit(status);
                     break;
                 } else if (isValidFilePath(input)) {
                     System.out.println("Ruta válida ingresada: " + input);
+                    if(!extraArgs.isEmpty())
+                    {
+                        System.err.println("too many arguments");
+                        status = 1;
+                    }
+                    else
+                    {
+                        status = run(communicator);
+                    }
                 } else {
                     System.out.println("La ruta ingresada no es válida. Intenta nuevamente.");
                 }
             }
-
+            System.exit(status);
             communicator.destroy();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
             sc.close();
         }
+    }
+
+    private static int run(Communicator communicator) {
+        ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback","tcp -h 0.0.0.0");
+        com.zeroc.Ice.Object clientCallback = new CallbackI();
+        ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
+        CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
+        adapter.activate();
+        return  0;
     }
 
     private static boolean isValidFilePath(String path) {

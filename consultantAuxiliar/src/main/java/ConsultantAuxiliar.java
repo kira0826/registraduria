@@ -1,3 +1,5 @@
+import java.util.stream.Collectors;
+
 import com.zeroc.Ice.*;
 import com.zeroc.IceStorm.AlreadySubscribed;
 import com.zeroc.IceStorm.BadQoS;
@@ -5,6 +7,8 @@ import com.zeroc.IceStorm.InvalidSubscriber;
 import com.zeroc.IceStorm.NoSuchTopic;
 import com.zeroc.IceStorm.TopicManagerPrx;
 import com.zeroc.IceStorm.TopicPrx;
+
+import RegistryModule.ConsultantAuxiliarManager;
 
 public class ConsultantAuxiliar {
 
@@ -33,8 +37,7 @@ public class ConsultantAuxiliar {
             ConsultantAuxiliar consultant = new ConsultantAuxiliar(workerId, masterId);
             Thread destroyHook = new Thread(() -> communicator.destroy());
             Runtime.getRuntime().addShutdownHook(destroyHook);
-            // int status = consultant.run(communicator, destroyHook);
-            int status = consultant.run(communicator);
+            int status = consultant.run(communicator, destroyHook);
             System.exit(status);
         } catch (LocalException e) {
             e.printStackTrace();
@@ -59,6 +62,7 @@ public class ConsultantAuxiliar {
 
             // Permitir sobrescribir propiedades desde línea de comandos
             args = initData.properties.parseCommandLineOptions("Worker", args);
+            args = initData.properties.parseCommandLineOptions("Auxiliar", args);
 
             return Util.initialize(args, initData);
         } catch (LocalException e) {
@@ -67,49 +71,52 @@ public class ConsultantAuxiliar {
             return null;
         }
 
-        // java.util.List<String> extraArgs = new java.util.ArrayList<String>();
-        // try (com.zeroc.Ice.Communicator communicator =
-        // com.zeroc.Ice.Util.initialize(args, "config.sub", extraArgs)) {
-        // // Destroy communicator during JVM shutdown
-
-        // return communicator;
-        // } catch (LocalException e) {
-        // e.printStackTrace();
-        // return null;
-        // }
     }
 
-    private int run(com.zeroc.Ice.Communicator communicator) {
+    private int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook) {
+
+        System.out.println("Properties: " + communicator.getProperties().getPropertiesForPrefix("").entrySet().stream()
+                .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(", ")));
+
         try {
             TopicManagerPrx manager = TopicManagerPrx.checkedCast(
                     communicator.propertyToProxy("TopicManager.Proxy"));
 
             // Crear/obtener topic específico master-worker
-            String privateTopicName = String.format("master.%s.%s", masterId, workerId);
+            String privateTopicName = String.format("%s.%s", masterId, workerId);
+            System.out.println("Private topic: " + privateTopicName);
             TopicPrx privateTopic = getOrCreateTopic(manager, privateTopicName);
 
             // Crear/obtener topic general
             String generalTopicName = "general.tasks";
+            System.out.println("General topic: " + generalTopicName);
             TopicPrx generalTopic = getOrCreateTopic(manager, generalTopicName);
 
             // Crear el adapter y el servant
-            ObjectAdapter adapter = communicator.createObjectAdapter("Worker.Subscriber");
-            ConsultantAuxiliarManagerImpl servant = new ConsultantAuxiliarManagerImpl();
+            ObjectAdapter adapter = communicator.createObjectAdapter("Auxiliar.Subscriber");
+            ConsultantAuxiliarManager servant = new ConsultantAuxiliarManagerImpl();
 
             // Suscribirse al topic privado
-            Identity privateId = new Identity(workerId + ".private", "worker");
+            Identity privateId = new Identity(workerId + ".private" + java.util.UUID.randomUUID().toString(), "worker");
+            if (privateId.name == null) {
+                privateId.name = java.util.UUID.randomUUID().toString();
+            }
             ObjectPrx privateSubscriber = adapter.add(servant, privateId);
             subscribeToTopic(privateTopic, privateSubscriber, true); // QoS ordenado para mensajes privados
 
             // Suscribirse al topic general
-            Identity generalId = new Identity(workerId + ".general", "worker");
+            Identity generalId = new Identity(workerId + ".general" + java.util.UUID.randomUUID().toString(), "worker");
+            if (generalId.name == null) {
+                generalId.name = java.util.UUID.randomUUID().toString();
+            }
             ObjectPrx generalSubscriber = adapter.add(servant, generalId);
             subscribeToTopic(generalTopic, generalSubscriber, false); // QoS estándar para mensajes generales
 
             adapter.activate();
 
             // Configurar shutdown hooks para ambas suscripciones
-            setupShutdownHook(privateTopic, privateSubscriber, generalTopic, generalSubscriber, communicator);
+            setupShutdownHook(privateTopic, privateSubscriber, generalTopic, generalSubscriber, communicator,
+                    destroyHook);
 
             communicator.waitForShutdown();
             return 0;
@@ -159,89 +166,21 @@ public class ConsultantAuxiliar {
 
     private void setupShutdownHook(TopicPrx privateTopic, ObjectPrx privateSubscriber,
             TopicPrx generalTopic, ObjectPrx generalSubscriber,
-            Communicator communicator) {
+            Communicator communicator, Thread destroyHook) {
+
+        final com.zeroc.IceStorm.TopicPrx topicF = privateTopic;
+        final com.zeroc.IceStorm.TopicPrx topicGenF = privateTopic;
+        final com.zeroc.Ice.ObjectPrx subscriberF = generalTopic;
+        final com.zeroc.Ice.ObjectPrx subscriberGenF = generalSubscriber;
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                privateTopic.unsubscribe(privateSubscriber);
-                generalTopic.unsubscribe(generalSubscriber);
+                topicF.unsubscribe(subscriberF);
+                topicGenF.unsubscribe(subscriberGenF);
             } finally {
                 communicator.destroy();
-                /*Comentario de prueba*/
             }
         }));
+        Runtime.getRuntime().removeShutdownHook(destroyHook);
     }
 
-    // private int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook)
-    // {
-
-    // System.out.println("Running the worker");
-    // System.out.println("Inside run Worker ID: " + workerId);
-    // System.out.println("Inside run Master ID: " + masterId);
-
-    // try {
-    // // Obtener el TopicManager
-    // TopicManagerPrx manager = TopicManagerPrx.checkedCast(
-    // communicator.propertyToProxy("TopicManager.Proxy"));
-    // if (manager == null) {
-    // System.err.println("Invalid proxy");
-    // return 1;
-    // }
-
-    // // Obtener o crear el topic
-    // String topicName = "master";
-    // TopicPrx topic;
-    // try {
-    // topic = manager.retrieve(topicName);
-    // } catch (com.zeroc.IceStorm.NoSuchTopic e) {
-    // try {
-    // topic = manager.create(topicName);
-    // } catch (com.zeroc.IceStorm.TopicExists ex) {
-    // System.err.println("Topic exists, try again.");
-    // return 1;
-    // }
-    // }
-
-    // // Crear el adapter y añadir el servant
-    // ObjectAdapter adapter =
-    // communicator.createObjectAdapter("Auxiliar.Subscriber");
-    // Identity subscriberId = new Identity(
-    // java.util.UUID.randomUUID().toString(), "");
-    // ObjectPrx subscriber = adapter.add(new ConsultantAuxiliarManagerImpl(),
-    // subscriberId);
-
-    // // Activar el adapter
-    // adapter.activate();
-
-    // // Suscribirse al topic
-    // java.util.Map<String, String> qos = new java.util.HashMap<>();
-    // topic.subscribeAndGetPublisher(qos, subscriber);
-
-    // // Configurar el shutdown hook para desuscribirse
-    // final com.zeroc.IceStorm.TopicPrx topicF = topic;
-    // final com.zeroc.Ice.ObjectPrx subscriberF = subscriber;
-    // Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-    // try {
-    // topicF.unsubscribe(subscriberF);
-    // } finally {
-    // communicator.destroy();
-    // }
-    // }));
-    // Runtime.getRuntime().removeShutdownHook(destroyHook); // remove old
-    // destroy-only shutdown hook
-    // communicator.waitForShutdown();
-    // return 0;
-
-    // // Esperar hasta que la aplicación se cierre
-    // } catch (AlreadySubscribed e) {
-    // e.printStackTrace();
-    // System.out.println("reactivating persistent subscriber");
-    // return 1;
-    // } catch (InvalidSubscriber e) {
-    // e.printStackTrace();
-    // return 1;
-    // } catch (BadQoS e) {
-    // e.printStackTrace();
-    // return 1;
-    // }
-    // }
 }

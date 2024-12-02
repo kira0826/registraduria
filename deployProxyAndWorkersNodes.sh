@@ -80,7 +80,7 @@ Ice.Default.Locator=registryConsultantClient/Locator:tcp -h $LOCATOR_IP -p $LOCA
 EOF
 
             # Ruta local al archivo de configuración de admin
-            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryclient.conf"
+            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryproxy.conf"
 
             # Verificar si el archivo existe
             if [ ! -f "$LOCAL_ADMIN_CONF" ]; then
@@ -97,7 +97,7 @@ EOF
             sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$CONFIG_FILE" "$USER_AT_HOST:$REMOTE_DIR/icegridnode.conf"
 
             # Copiar el archivo adminregistryclient.conf al nodo remoto como admin.conf
-            sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$LOCAL_ADMIN_CONF" "$USER_AT_HOST:$REMOTE_DIR/admin.conf"
+            sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$LOCAL_ADLOCAL_ADMIN_CONFMIN_CONF" "$USER_AT_HOST:$REMOTE_DIR/admin.conf"
 
             echo "Iniciando $NODE_NAME en $USER_AT_HOST"
 

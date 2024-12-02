@@ -11,9 +11,7 @@ module RegistryModule
 
 
     interface Callback {
-
         void reportResponse(Response response);
-        
     }   
 
     //Client interfaces
@@ -60,9 +58,30 @@ module RegistryModule
 
     //Consultant auxiliar
 
+    interface MathPrimes{
+
+        int calculatePrime(int id);
+
+    }
+
+    interface ConsultantManager{
+
+
+        void performQuery(StringSeq ids, Callback* callback);
+
+    }
+
+    interface ConsultantServiceManager{
+
+        void setPoolsize(int n);
+        void searchDocumentsByPath(string path);
+    }
+
+
     interface ConsultantAuxiliarManager{
 
         void shutdown();
+
 
         void setPoolSize(int n);
 

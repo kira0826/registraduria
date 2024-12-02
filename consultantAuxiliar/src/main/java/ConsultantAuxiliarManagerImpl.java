@@ -1,5 +1,5 @@
 import RegistryModule.ConsultantAuxiliarManager;
-import RegistryModule.ConsultantAuxiliarManagerPrx;
+import RegistryModule.PerformQueryPrx;
 import RegistryModule.Task;
 import com.zeroc.Ice.Current;
 import com.zeroc.Ice.ObjectAdapter;
@@ -11,17 +11,19 @@ import java.util.concurrent.*;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
 
-    private final ObjectAdapter adapter;
+    PerformQueryPrx performQuery;
 
-    public ConsultantAuxiliarManagerImpl(ObjectAdapter adapter){
-        this.adapter = adapter;
+    public ConsultantAuxiliarManagerImpl(PerformQueryPrx performQuery) {
+        this.performQuery = performQuery;
     }
+
     private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
             4,
             8,
             60, TimeUnit.SECONDS,
-            new LinkedBlockingQueue<>()
-    );    @Override
+            new LinkedBlockingQueue<>());
+
+    @Override
     public void shutdown(Current current) {
         // Implementar logia para verificar a que topics estoy suscrito y mirar si puedo
         // apagarme
@@ -58,7 +60,7 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
         });
     }
 
-    private String processTask(Task task){
+    private String processTask(Task task) {
         return "Tarea procesada";
     }
 

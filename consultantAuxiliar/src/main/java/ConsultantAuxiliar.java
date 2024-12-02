@@ -1,6 +1,7 @@
 import java.util.stream.Collectors;
 
 import com.zeroc.Ice.*;
+import com.zeroc.IceGrid.QueryPrx;
 import com.zeroc.IceStorm.AlreadySubscribed;
 import com.zeroc.IceStorm.BadQoS;
 import com.zeroc.IceStorm.InvalidSubscriber;
@@ -9,6 +10,7 @@ import com.zeroc.IceStorm.TopicManagerPrx;
 import com.zeroc.IceStorm.TopicPrx;
 
 import RegistryModule.ConsultantAuxiliarManager;
+import RegistryModule.PerformQueryPrx;
 
 public class ConsultantAuxiliar {
 
@@ -35,9 +37,31 @@ public class ConsultantAuxiliar {
             System.out.println("Master ID: " + masterId);
 
             ConsultantAuxiliar consultant = new ConsultantAuxiliar(workerId, masterId);
+
+            ObjectPrx obj = communicator.stringToProxy("IceGrid/Query");
+            QueryPrx query = QueryPrx.checkedCast(obj);
+
+            if (query == null) {
+                throw new Error("Invalid proxy");
+            }
+
+            // Buscar el servicio PerformQuery a través de IceGrid
+            // Usamos el tipo completo como está definido en el XML de IceGrid
+            ObjectPrx base = query.findObjectByType("::RegistryModule::PerformQuery");
+            if (base == null) {
+                throw new Error("No PerformQuery service found");
+            }
+
+            // Convertir el proxy genérico a PerformQueryPrx
+            PerformQueryPrx performQuery = PerformQueryPrx.checkedCast(base);
+            if (performQuery == null) {
+                throw new Error("Invalid PerformQuery proxy");
+            }
+
+            // ------------------------------------------------------------------------------
             Thread destroyHook = new Thread(() -> communicator.destroy());
             Runtime.getRuntime().addShutdownHook(destroyHook);
-            int status = consultant.run(communicator, destroyHook);
+            int status = consultant.run(communicator, destroyHook, performQuery);
             System.exit(status);
         } catch (LocalException e) {
             e.printStackTrace();
@@ -73,7 +97,7 @@ public class ConsultantAuxiliar {
 
     }
 
-    private int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook) {
+    private int run(com.zeroc.Ice.Communicator communicator, Thread destroyHook, PerformQueryPrx performQuery) {
 
         System.out.println("Properties: " + communicator.getProperties().getPropertiesForPrefix("").entrySet().stream()
                 .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(", ")));
@@ -94,7 +118,7 @@ public class ConsultantAuxiliar {
 
             // Crear el adapter y el servant
             ObjectAdapter adapter = communicator.createObjectAdapter("Auxiliar.Subscriber");
-            ConsultantAuxiliarManager servant = new ConsultantAuxiliarManagerImpl(adapter);
+            ConsultantAuxiliarManager servant = new ConsultantAuxiliarManagerImpl(performQuery);
 
             // Suscribirse al topic privado
             Identity privateId = new Identity(workerId + ".private" + java.util.UUID.randomUUID().toString(), "worker");

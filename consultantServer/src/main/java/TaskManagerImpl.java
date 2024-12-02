@@ -44,7 +44,7 @@ public class TaskManagerImpl implements TaskManager {
     }
 
     @Override
-    public void addPartialResult(String result, String taskId,Current current) {
+    public void addPartialResult(String result, String taskId, Current current) {
         inProgressTasks.stream()
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()
@@ -95,12 +95,11 @@ public class TaskManagerImpl implements TaskManager {
         }
     }
 
-
     private void readPath() {
         ClassLoader classLoader = TaskManagerImpl.class.getClassLoader();
-        try(InputStream inputStream = classLoader.getResourceAsStream(path);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            if(inputStream == null) {
+        try (InputStream inputStream = classLoader.getResourceAsStream(path);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            if (inputStream == null) {
                 System.out.println("Archivo no encontrado");
                 return;
             }
@@ -108,7 +107,7 @@ public class TaskManagerImpl implements TaskManager {
             while ((line = reader.readLine()) != null) {
                 cedulasList.add(line.trim());
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

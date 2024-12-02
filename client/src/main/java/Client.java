@@ -46,13 +46,10 @@ public class Client {
                     break;
                 } else if (isValidFilePath(input)) {
                     System.out.println("Ruta válida ingresada: " + input);
-                    if(!extraArgs.isEmpty())
-                    {
+                    if (!extraArgs.isEmpty()) {
                         System.err.println("too many arguments");
                         status = 1;
-                    }
-                    else
-                    {
+                    } else {
                         status = run(communicator);
                     }
                 } else {
@@ -69,12 +66,12 @@ public class Client {
     }
 
     private static int run(Communicator communicator) {
-        ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback","tcp -h 0.0.0.0");
+        ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback", "tcp -h 0.0.0.0");
         com.zeroc.Ice.Object clientCallback = new CallbackI();
         ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
         CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
         adapter.activate();
-        return  0;
+        return 0;
     }
 
     private static boolean isValidFilePath(String path) {

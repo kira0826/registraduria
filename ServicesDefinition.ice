@@ -22,20 +22,7 @@ module RegistryModule
 
     }
 
-    //Proxypool connection 
-
-    interface PerformQuery{
-
-
-
-        void receiveMessage(StringSeq ids, Callback* callback);
-        
-    }
-
-    //Consultant server
-
-
-    class Task{
+      class Task{
 
         StringSeq ids;
 
@@ -57,6 +44,19 @@ module RegistryModule
 
         string getResult();
     }
+
+    //Proxypool connection 
+
+    interface PerformQuery{
+
+        void receiveMessage(StringSeq ids, TaskManager* taskManager,  string taskId );
+
+    }
+
+    //Consultant server
+
+
+  
 
     //Consultant auxiliar
 

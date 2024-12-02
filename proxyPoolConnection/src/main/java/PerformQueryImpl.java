@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 
 import com.zeroc.Ice.Current;
 
-import RegistryModule.CallbackPrx;
+import RegistryModule.TaskManagerPrx;
 
 public class PerformQueryImpl implements RegistryModule.PerformQuery {
 
@@ -65,9 +65,17 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
     }
 
     @Override
-    public void receiveMessage(String[] ids, CallbackPrx callback, Current current) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'receiveMessage'");
-    }
+    public void receiveMessage(String[] ids, TaskManagerPrx taskManager, String taskId, Current current) {
+
+
+        String query = makeQuery(ids, current);
+        String result = executeQuery(query, current);
+        taskManager.addPartialResult(result, taskId);
+
+        }
+
+  
+
+    
 
 }

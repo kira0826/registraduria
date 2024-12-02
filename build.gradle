@@ -25,6 +25,7 @@ subprojects {
         implementation 'com.zaxxer:HikariCP:6.2.1'
         implementation 'org.postgresql:postgresql:42.7.4'
         implementation 'org.slf4j:slf4j-api:1.6.1'
+        runtimeOnly 'com.zeroc:icegrid:3.7.10'
         implementation 'ch.qos.logback:logback-classic:1.2.11'
         implementation 'com.zeroc:icegrid:3.7.6' 
         runtimeOnly 'com.zeroc:icelocatordiscovery:3.7.6'

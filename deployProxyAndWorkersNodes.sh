@@ -80,7 +80,7 @@ Ice.Default.Locator=registryConsultantClient/Locator:tcp -h $LOCATOR_IP -p $LOCA
 EOF
 
             # Ruta local al archivo de configuración de admin
-            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryclient.conf"
+            LOCAL_ADMIN_CONF="./iceGrid/nodes/adminregistryproxy.conf"
 
             # Verificar si el archivo existe
             if [ ! -f "$LOCAL_ADMIN_CONF" ]; then

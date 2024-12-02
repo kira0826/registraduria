@@ -9,8 +9,9 @@ Auxiliar.Subscriber.Endpoints=tcp -h localhost -p 0:udp -h localhost -p 0
 asd
 #
 # This property is used by the clients to connect to IceStorm. It goes to iceStorm endpoints
+# Right now the iceBox is xhgrid13 
 #
-TopicManager.Proxy=DemoIceStorm/TopicManager:default -h localhost -p 10000
+TopicManager.Proxy=DemoIceStorm/TopicManager:default -h 10.147.19.135 -p 10000
 
 #
 # IceMX configuration.
@@ -23,7 +24,7 @@ IceMX.Metrics.ByParent.GroupBy=parent
 # --------------------------------------------------------
 # Client configuration
 
-TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000
+TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000    
 
 # Server Location. It goes where the master is
 # Ice.Default.Host=

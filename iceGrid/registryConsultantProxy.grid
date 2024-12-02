@@ -1,0 +1,12 @@
+IceGrid.InstanceName=registryConsultantProxy
+
+IceGrid.Registry.Client.Endpoints=default -h 10.147.19.138 -p 30000
+IceGrid.Registry.Server.Endpoints=default -h 10.147.19.138 -p 30001
+IceGrid.Registry.Internal.Endpoints=default -h 10.147.19.138 -p 30002
+IceGrid.Registry.AdminPermissionsVerifier=registryConsultantProxy/NullPermissionsVerifier
+IceGrid.Registry.LMDB.Path=logs/registryConsultantProxy
+IceGrid.Registry.Discovery.Interface=10.147.19.138
+
+
+
+

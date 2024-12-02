@@ -1,22 +1,63 @@
+import RegistryModule.ConsultantAuxiliarManager;
+import RegistryModule.Task;
 import com.zeroc.Ice.Current;
 import com.zeroc.Ice.Value;
 
 import RegistryModule.TaskManagerPrx;
 
-public class ConsultantAuxiliarManagerImpl implements RegistryModule.ConsultantAuxiliarManager {
+import java.util.concurrent.*;
 
-    @Override
+public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
+    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            4,
+            8,
+            60, TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>()
+    );    @Override
     public void shutdown(Current current) {
         // Implementar logia para verificar a que topics estoy suscrito y mirar si puedo
         // apagarme
         System.out.println("Shutting down the worker");
+        if (!executor.isShutdown()) {
+            executor.shutdown();
+        }
+    }
+
+    @Override
+    public void setPoolSize(int n, Current current) {
+        System.out.println("Adjusting ThreadPool size: coreSize=" + n + ", maxSize=" + n);
+        executor.setCorePoolSize(n);
+        executor.setMaximumPoolSize(n);
+
     }
 
     @Override
     public void launch(TaskManagerPrx taskManager, Current current) {
         // Implementar logica para lanzar el worker y empezar a pedir tareas
-        System.out.println("Launching the worker with task manager task: " + taskManager.getTask().hostname);
+        executor.submit(() -> {
+            try {
+                Task task = taskManager.getTask();
+                if (task != null) {
+                    try {
+                        Thread.currentThread();
+                        Thread.sleep(500);
+                    }catch(InterruptedException e){
+                        e.printStackTrace();
+                    }
+                    String result = processTask(task);
+                    taskManager.addPartialResult(result, task.id);
+                    System.out.println("Task completed: " + task.id);
+                } else {
+                    System.out.println("No task available for this worker.");
+                }
+            } catch (Exception e) {
+                System.err.println("Error processing task: " + e.getMessage());
+            }
+        });
+    }
 
+    private String processTask(Task task){
+        return "Tarea procesada";
     }
 
 }

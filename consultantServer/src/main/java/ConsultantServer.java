@@ -10,6 +10,8 @@ import RegistryModule.TaskManagerPrx;
 
 public class ConsultantServer {
     private final String masterId;
+    private final int poolSize = 8;
+    private static final String path = "cedulas.txt";
 
     public ConsultantServer(String masterId) {
         this.masterId = masterId;
@@ -31,7 +33,7 @@ public class ConsultantServer {
 
             // Create TaskManager
             ObjectAdapter adapter = communicator.createObjectAdapter("TaskManager");
-            TaskManager taskManager = new TaskManagerImpl("Private task");
+            TaskManager taskManager = new TaskManagerImpl(path);
             ObjectPrx prx = adapter.add(taskManager, Util.stringToIdentity("SimpleTaskManager"));
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
 
@@ -96,20 +98,23 @@ public class ConsultantServer {
                     privateTopic.getPublisher().ice_oneway());
             ConsultantAuxiliarManagerPrx generalWorker = ConsultantAuxiliarManagerPrx.uncheckedCast(
                     generalTopic.getPublisher().ice_oneway());
-
+            generalWorker.setPoolSize(poolSize);
             System.out.println("Publishing events. Press ^C to terminate the application.");
-            while (true) {
-                // Publicar en ambos topics
+            if(taskManager.getRemainingTasks()==1){
                 privateWorker.launch(taskManager);
-                // generalWorker.launch(taskManager);
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    break;
+            }else{
+                while (taskManager.getRemainingTasks()>0) {
+                    generalWorker.launch(taskManager);
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
                 }
             }
-
+            taskManager.shutdown();
+            System.out.println("Resultado:");
+            System.out.println(taskManager.getResult());
             return 0;
         } catch (LocalException e) {
             e.printStackTrace();

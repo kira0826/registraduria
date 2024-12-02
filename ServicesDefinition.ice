@@ -60,18 +60,6 @@ module RegistryModule
 
     //Consultant auxiliar
 
-    interface MathPrimes{
-
-        int calculatePrime(int id);
-
-    }
-
-    interface ConsultantManager{
-
-        void performQuery(StringSeq ids, Callback* callback);
-
-    }
-
     interface ConsultantAuxiliarManager{
 
         void shutdown();

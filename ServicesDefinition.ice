@@ -62,7 +62,6 @@ module RegistryModule
 
     interface ConsultantManager{
 
-
         void performQuery(StringSeq ids, Callback* callback);
 
     }

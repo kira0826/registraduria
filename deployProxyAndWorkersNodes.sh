@@ -97,7 +97,7 @@ EOF
             sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$CONFIG_FILE" "$USER_AT_HOST:$REMOTE_DIR/icegridnode.conf"
 
             # Copiar el archivo adminregistryclient.conf al nodo remoto como admin.conf
-            sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$LOCAL_ADLOCAL_ADMIN_CONFMIN_CONF" "$USER_AT_HOST:$REMOTE_DIR/admin.conf"
+            sshpass -p "$PASSWORD" scp -o StrictHostKeyChecking=no "$LOCAL_ADMIN_CONF" "$USER_AT_HOST:$REMOTE_DIR/admin.conf"
 
             echo "Iniciando $NODE_NAME en $USER_AT_HOST"
 

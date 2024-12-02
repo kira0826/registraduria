@@ -45,6 +45,8 @@ module RegistryModule
 
     interface TaskManager{
 
+        void createTasks(string path);
+
         void addPartialResult(string result, string taskId);
 
         int getRemainingTasks();
@@ -74,14 +76,14 @@ module RegistryModule
     interface ConsultantServiceManager{
 
         void setPoolsize(int n);
-        void searchDocumentsByPath(string path);
+
+        void searchDocumentsByPath(string path, Callback* callback);
     }
 
 
     interface ConsultantAuxiliarManager{
 
         void shutdown();
-
 
         void setPoolSize(int n);
 

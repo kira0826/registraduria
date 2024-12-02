@@ -1,6 +1,8 @@
 import RegistryModule.ConsultantAuxiliarManager;
+import RegistryModule.ConsultantAuxiliarManagerPrx;
 import RegistryModule.Task;
 import com.zeroc.Ice.Current;
+import com.zeroc.Ice.ObjectAdapter;
 import com.zeroc.Ice.Value;
 
 import RegistryModule.TaskManagerPrx;
@@ -8,6 +10,12 @@ import RegistryModule.TaskManagerPrx;
 import java.util.concurrent.*;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
+
+    private final ObjectAdapter adapter;
+
+    public ConsultantAuxiliarManagerImpl(ObjectAdapter adapter){
+        this.adapter = adapter;
+    }
     private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(
             4,
             8,
@@ -38,12 +46,6 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
             try {
                 Task task = taskManager.getTask();
                 if (task != null) {
-                    try {
-                        Thread.currentThread();
-                        Thread.sleep(500);
-                    }catch(InterruptedException e){
-                        e.printStackTrace();
-                    }
                     String result = processTask(task);
                     taskManager.addPartialResult(result, task.id);
                     System.out.println("Task completed: " + task.id);

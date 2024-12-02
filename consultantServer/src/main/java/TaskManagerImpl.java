@@ -32,11 +32,12 @@ public class TaskManagerImpl implements TaskManager {
     private final ReentrantLock lock = new ReentrantLock();
     private final ScheduledExecutorService supervisor = Executors.newScheduledThreadPool(1);
 
-    String path;
+    private String path;
     final int maxCapacity = 250;
 
-    public TaskManagerImpl(String path) {
-        this.path = path;
+    @Override
+    public void createTasks(String path, Current current) {
+        setPath(path);
         readPath();
         validateTasks();
         startSupervisor();
@@ -76,6 +77,12 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public void shutdown(Current current) {
         supervisor.shutdown();
+        lock.lock();
+        try {
+            concurrentString.setLength(0);
+        } finally {
+            lock.unlock();
+        }
     }
 
     @Override
@@ -140,4 +147,7 @@ public class TaskManagerImpl implements TaskManager {
         return taskQueue.size();
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
 }

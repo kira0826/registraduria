@@ -94,7 +94,7 @@ public class ConsultantAuxiliar {
 
             // Crear el adapter y el servant
             ObjectAdapter adapter = communicator.createObjectAdapter("Auxiliar.Subscriber");
-            ConsultantAuxiliarManager servant = new ConsultantAuxiliarManagerImpl();
+            ConsultantAuxiliarManager servant = new ConsultantAuxiliarManagerImpl(adapter);
 
             // Suscribirse al topic privado
             Identity privateId = new Identity(workerId + ".private" + java.util.UUID.randomUUID().toString(), "worker");

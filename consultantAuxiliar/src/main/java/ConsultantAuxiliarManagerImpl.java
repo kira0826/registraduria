@@ -1,13 +1,13 @@
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+import com.zeroc.Ice.Current;
+
 import RegistryModule.ConsultantAuxiliarManager;
 import RegistryModule.PerformQueryPrx;
 import RegistryModule.Task;
-import com.zeroc.Ice.Current;
-import com.zeroc.Ice.ObjectAdapter;
-import com.zeroc.Ice.Value;
-
 import RegistryModule.TaskManagerPrx;
-
-import java.util.concurrent.*;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
 
@@ -48,9 +48,8 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
             try {
                 Task task = taskManager.getTask();
                 if (task != null) {
-                    String result = processTask(task);
-                    taskManager.addPartialResult(result, task.id);
-                    System.out.println("Task completed: " + task.id);
+                    String result = processTask(task, taskManager);
+                    System.out.println("Task processed: " + result);                    
                 } else {
                     System.out.println("No task available for this worker.");
                 }
@@ -60,8 +59,12 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
         });
     }
 
-    private String processTask(Task task) {
-        return "Tarea procesada";
+
+    private String processTask(Task task,  TaskManagerPrx taskManager) {
+    
+        performQuery.receiveMessage( task.ids, taskManager, task.id);
+
+        return "Tarea procesada"; 
     }
 
 }

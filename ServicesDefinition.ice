@@ -4,6 +4,8 @@ module RegistryModule
 
     sequence<string> StringSeq;
 
+    dictionary<string, string> Result;
+
     class Response{
         long responseTime;
         string value;
@@ -34,7 +36,7 @@ module RegistryModule
 
         void createTasks(string path);
 
-        void addPartialResult(string result, string taskId);
+        void addPartialResult(Result result, string taskId);
 
         int getRemainingTasks();
 

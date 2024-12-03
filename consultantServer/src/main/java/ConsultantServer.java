@@ -34,6 +34,7 @@ public class ConsultantServer {
             adapter.activate();
             // Create ConsultantServiceManager
             com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator
+
                     .createObjectAdapter("ConsultantServiceManager");
             com.zeroc.Ice.Properties properties = communicator.getProperties();
             com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));

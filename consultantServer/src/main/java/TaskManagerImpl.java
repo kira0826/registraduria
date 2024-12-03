@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -44,7 +41,7 @@ public class TaskManagerImpl implements TaskManager {
     }
 
     @Override
-    public void addPartialResult(String result, String taskId, Current current) {
+    public void addPartialResult(Map<String, String> result, String taskId, Current current) {
         inProgressTasks.stream()
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()

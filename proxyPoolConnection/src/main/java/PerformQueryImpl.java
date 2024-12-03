@@ -1,7 +1,6 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringJoiner;
 
 import javax.sql.DataSource;
@@ -18,20 +17,26 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
         this.dataSource = dataSource;
     }
 
-    private String executeQuery(String query, Current current) {
-        StringBuilder resultBuilder = new StringBuilder();
+    private Map<String, String> executeQuery(String query, Current current) {
+        Map<String, String> resultMap = new HashMap<>();
 
         try (Connection connection = dataSource.getConnection();
-                PreparedStatement stmt = connection.prepareStatement(query);
-                ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = connection.prepareStatement(query);
+             ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                resultBuilder.append("Documento: ").append(rs.getString("documento"))
-                        .append(", Departamento: ").append(rs.getString("departamento_nombre"))
-                        .append(", Municipio: ").append(rs.getString("municipio_nombre"))
-                        .append(", Puesto de votación: ").append(rs.getString("puesto_votacion_nombre"))
-                        .append(", Mesa: ").append(rs.getString("mesa_votacion_consecutive"))
-                        .append("\n");
+                ResultSetMetaData metaData = rs.getMetaData();
+                int columnCount = metaData.getColumnCount();
+
+                String documento = rs.getString("documento");
+
+                StringJoiner detallesJoiner = new StringJoiner(", ");
+                for (int i = 1; i <= columnCount; i++) {
+                    String columnValue = rs.getString(i);
+                    detallesJoiner.add(columnValue != null ? columnValue : "");
+                }
+
+                resultMap.put(documento, detallesJoiner.toString());
             }
 
         } catch (SQLException e) {
@@ -39,7 +44,7 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
             throw new RuntimeException("Error ejecutando la consulta: " + e.getMessage());
         }
 
-        return resultBuilder.toString();
+        return resultMap;
     }
 
     private String makeQuery(String[] ids, Current current) {
@@ -69,7 +74,7 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
 
 
         String query = makeQuery(ids, current);
-        String result = executeQuery(query, current);
+        Map<String,String> result = executeQuery(query, current);
         taskManager.addPartialResult(result, taskId);
 
         }

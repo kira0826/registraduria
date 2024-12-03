@@ -1,4 +1,5 @@
 import java.util.Arrays;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -65,10 +66,10 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
     }
 
 
-    private String processTask(Task task,  TaskManagerPrx taskManager) {
+    private String processTask(Task task,  TaskManagerPrx taskManager) throws ExecutionException, InterruptedException {
 
     
-        taskManager.addPartialResult(Arrays.asList(task.ids).toString(), task.id);
+        taskManager.addPartialResult(mathPrimes.isPrimeFactorCount(Arrays.asList(task.ids)), task.id);
 
         performQuery.receiveMessage( task.ids, taskManager, task.id);
 

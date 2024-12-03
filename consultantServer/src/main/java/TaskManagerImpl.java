@@ -1,7 +1,12 @@
 import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
@@ -109,19 +114,26 @@ public class TaskManagerImpl implements TaskManager {
         }
     }
 
-    private void readPath() {
-        ClassLoader classLoader = TaskManagerImpl.class.getClassLoader();
-        try(InputStream inputStream = classLoader.getResourceAsStream(path);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            if(inputStream == null) {
-                System.out.println("Archivo no encontrado");
-                return;
-            }
+private void readPath() {
+        String jarDir;
+        try {
+            jarDir = new File(TaskManagerImpl.class.getProtectionDomain()
+                    .getCodeSource()
+                    .getLocation()
+                    .toURI()).getParent();
+        } catch (Exception e) {
+            System.out.println("Error al obtener el directorio del JAR");
+            e.printStackTrace();
+            return;
+        }
+        File file = new File(jarDir, path);
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 cedulasList.add(line.trim());
             }
-        } catch(Exception e) {
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo: " + file.getAbsolutePath());
             e.printStackTrace();
         }
     }

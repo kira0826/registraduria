@@ -46,7 +46,7 @@ public class Client {
             return 1;
         }
 
-        int n = getThreadPoolSize();
+        //int n = getThreadPoolSize();
         String filePath = getFilePath();
 
         // consultantServiceManager.setPoolsize(n);

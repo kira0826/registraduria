@@ -41,9 +41,12 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
                 .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(", ")));
 
         try {
+
             TopicManagerPrx manager = TopicManagerPrx.checkedCast(
                     communicator.propertyToProxy("TopicManager.Proxy"));
+            System.out.println("Se obtuvo el topicManager DE ICEstor");
             if (manager == null) {
+                System.out.println("NO se encontro topic manager");
                 System.err.println("invalid proxy");
                 return 1;
             }
@@ -57,30 +60,39 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
             String generalTopicName = "general.tasks";
             System.out.println("General topic: " + generalTopicName);
             TopicPrx generalTopic = getOrCreateTopic(manager, generalTopicName);
-
+            System.out.println("Obtener general topic");
             // Obtener publishers para ambos topics
             ConsultantAuxiliarManagerPrx privateWorker = ConsultantAuxiliarManagerPrx.uncheckedCast(
                     privateTopic.getPublisher().ice_oneway());
+            System.out.println("Obtener worker privado");
             ConsultantAuxiliarManagerPrx generalWorker = ConsultantAuxiliarManagerPrx.uncheckedCast(
                     generalTopic.getPublisher().ice_oneway());
             generalWorker.setPoolSize(poolSize);
+            System.out.println("Obtener workers generales");
             System.out.println("Publishing events. Press ^C to terminate the application.");
             long startTime = System.currentTimeMillis();
             if (taskManager.getRemainingTasks() == 1) {
                 System.out.println("Usando el private worker");
                 privateWorker.launch(taskManager);
+                System.out.println("Solo hay una tarea");
             } else {
+                System.out.println("Hay varias tareas");
                 while (taskManager.getRemainingTasks() > 0) {
                     System.out.println("Usando el general worker");
                     generalWorker.launch(taskManager);
                 }
             }
+            System.out.println("Tareas lanzadas esperar completitud");
             while (!taskManager.isCompleted()) {
             }
+            System.out.println("Se terminaron todas las tareas");
             long endTime = System.currentTimeMillis();
             long totalTime = endTime - startTime;
+            System.out.println("Apunto de enviar el callback");
             callbackPrx.reportResponse(new Response(totalTime, taskManager.getResult()));
+            System.out.println("Enviado callback");
             taskManager.shutdown();
+            System.out.println("Apagar taskmanager");
             return 0;
         } catch (LocalException e) {
             e.printStackTrace();

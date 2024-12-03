@@ -1,10 +1,10 @@
-import java.util.stream.Collectors;
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.InitializationData;
+import com.zeroc.Ice.LocalException;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.ObjectPrx;
+import com.zeroc.Ice.Util;
 
-import com.zeroc.Ice.*;
-import com.zeroc.IceStorm.TopicManagerPrx;
-import com.zeroc.IceStorm.TopicPrx;
-
-import RegistryModule.ConsultantAuxiliarManagerPrx;
 import RegistryModule.TaskManager;
 import RegistryModule.TaskManagerPrx;
 
@@ -31,13 +31,16 @@ public class ConsultantServer {
             TaskManager taskManager = new TaskManagerImpl();
             ObjectPrx prx = adapter.add(taskManager, Util.stringToIdentity("SimpleTaskManager"));
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
+
+            
             adapter.activate();
             // Create ConsultantServiceManager
             com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator
-                    .createObjectAdapter("ConsultantServiceManager");
+                    .createObjectAdapter("ConsultantServerAdapter");
             com.zeroc.Ice.Properties properties = communicator.getProperties();
             com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
             consultantServerManagerAdapter.add(new ConsultantServiceManagerImpl(communicator, taskManagerPrx, masterId), id);
+            
             consultantServerManagerAdapter.activate();
             communicator.waitForShutdown();
         } catch (LocalException e) {

@@ -16,7 +16,6 @@
                 <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/ConsultantServer-${index}.stdout.log" />
                 <adapter name="ConsultantServerAdapter">
                     <object identity="ConsultantServiceManagerIdentity-${master_id}" type="::RegistryModule::ConsultantServiceManager" property="Identity" />
-                    <object identity="TaskManagerIdentity-${master_id}" type="::RegistryModule::TaskManager" property="Identity" />
                 </adapter>
             </server>   
         </server-template>

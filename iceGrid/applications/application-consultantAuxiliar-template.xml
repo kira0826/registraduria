@@ -16,9 +16,8 @@
                 <option>--Auxiliar.Subscriber.Endpoints=${subscriber_endpoints}</option>
                 <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${worker_id}.stderr.log" />
                 <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${worker_id}.stdout.log" />
-                <adapter name="ConsultantAuxiliarAdapter" endpoints="${subscriber_endpoints}">
-                    <object identity="ConsultantAuxiliarManagerIdentity-${worker_id}" type="::RegistryModule::ConsultantAuxiliarManager" property="Identity" />
-                </adapter>
+                <property name="Ice.ServerIdleTime" value="0"/>
+                <property name="IceGrid.Node.WaitTime" value="60"/>
             </server>   
         </server-template>
     </application>
@@ -35,7 +34,7 @@
 
     <node name="Node5">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.19 -p 12003"/>
+            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.214 -p 12003"/>
     </node>
 
     <node name="Node6">

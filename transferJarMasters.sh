@@ -31,10 +31,8 @@ fi
 
 # Mapeo de hosts (usuarios y direcciones IP o nombres de host)
 HOSTS=(
-    "computacion2@10.147.19.147"
-    "computacion2@10.147.19.5"
-    "computacion2@10.147.19.214"
-    "computacion2@10.147.19.137"
+    "computacion2@10.147.19.139"
+    "computacion2@10.147.19.83"
 )
 
 # Contraseña para SSH y SCP 

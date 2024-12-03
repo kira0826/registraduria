@@ -88,6 +88,7 @@ public class ConsultantAuxiliar {
 
             // Permitir sobrescribir propiedades desde línea de comandos
             args = initData.properties.parseCommandLineOptions("Worker", args);
+            args = initData.properties.parseCommandLineOptions("Master", args);
             args = initData.properties.parseCommandLineOptions("Auxiliar", args);
 
             return Util.initialize(args, initData);

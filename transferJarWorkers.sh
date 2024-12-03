@@ -33,7 +33,7 @@ fi
 HOSTS=(
     "computacion2@10.147.19.147"
     "computacion2@10.147.19.5"
-    "computacion2@10.147.19.19"
+    "computacion2@10.147.19.214"
     "computacion2@10.147.19.137"
 )
 

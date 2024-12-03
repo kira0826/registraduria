@@ -15,14 +15,11 @@ public class Client {
     public static void main(String[] args) {
         int status = 0;
         List<String> extraArgs = new ArrayList<>();
-        try (Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs))
-        {
-            if(!extraArgs.isEmpty())
-            {
+        try (Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs)) {
+            if (!extraArgs.isEmpty()) {
                 System.err.println("too many arguments");
                 status = 1;
-            }
-            else {
+            } else {
                 status = run(communicator);
             }
         }
@@ -39,22 +36,21 @@ public class Client {
 
         ConsultantServiceManagerPrx consultantServiceManager = null;
 
-        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
-        consultantServiceManager = ConsultantServiceManagerPrx.checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
+        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx
+                .checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
+        consultantServiceManager = ConsultantServiceManagerPrx
+                .checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
 
-        if(consultantServiceManager == null)
-        {
+        if (consultantServiceManager == null) {
             System.err.println("couldn't find a `::RegistryModule::ConsultantServiceManager' object");
             return 1;
         }
 
-
         int n = getThreadPoolSize();
         String filePath = getFilePath();
 
-        //consultantServiceManager.setPoolsize(n);
-        consultantServiceManager.searchDocumentsByPath(filePath,callback);
-
+        // consultantServiceManager.setPoolsize(n);
+        consultantServiceManager.searchDocumentsByPath(filePath, callback);
 
         return 0;
     }

@@ -1,8 +1,10 @@
 import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Identity;
 import com.zeroc.Ice.InitializationData;
 import com.zeroc.Ice.LocalException;
 import com.zeroc.Ice.ObjectAdapter;
 import com.zeroc.Ice.ObjectPrx;
+import com.zeroc.Ice.Properties;
 import com.zeroc.Ice.Util;
 
 import RegistryModule.TaskManager;
@@ -32,17 +34,16 @@ public class ConsultantServer {
             ObjectPrx prx = adapter.add(taskManager, Util.stringToIdentity("SimpleTaskManager"));
             TaskManagerPrx taskManagerPrx = TaskManagerPrx.checkedCast(prx);
 
-            
             adapter.activate();
-            // Create ConsultantServiceManager
-            com.zeroc.Ice.ObjectAdapter consultantServerManagerAdapter = communicator
-                    .createObjectAdapter("ConsultantServiceManager");
 
-            com.zeroc.Ice.Properties properties = communicator.getProperties();
-            com.zeroc.Ice.Identity id = com.zeroc.Ice.Util.stringToIdentity(properties.getProperty("Identity"));
-            consultantServerManagerAdapter.add(new ConsultantServiceManagerImpl(communicator, taskManagerPrx, masterId), id);
-            
-            consultantServerManagerAdapter.activate();
+            // Crear y configurar ConsultantServiceManager (expuesto en IceGrid)
+            ObjectAdapter consultantServerAdapter = communicator.createObjectAdapter("ConsultantServerAdapter");
+            Properties properties = communicator.getProperties();
+            Identity consultantServiceId = Util.stringToIdentity(properties.getProperty("Identity"));
+            consultantServerAdapter.add(
+                    new ConsultantServiceManagerImpl(communicator, taskManagerPrx, masterId),
+                    consultantServiceId);
+            consultantServerAdapter.activate();
             communicator.waitForShutdown();
         } catch (LocalException e) {
             e.printStackTrace();

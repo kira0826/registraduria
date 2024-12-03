@@ -73,7 +73,7 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
         performQuery.receiveMessage( task.ids, taskManager, task.id);
 
         performQuery.receiveMessage( task.ids, taskManager, task.id);
-
+            
         return "Tarea procesada"; 
     }
 

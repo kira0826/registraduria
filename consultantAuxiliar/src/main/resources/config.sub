@@ -31,3 +31,6 @@ TaskManager.Proxy=SimpleTaskManager:tcp -p 30002 -t 5000
 
 # Threadpool
 Ice.ThreadPool.Server.Size=4
+
+
+Ice.Default.Locator=registryConsultantProxy/Locator:tcp -h 10.147.19.138 -p 30000

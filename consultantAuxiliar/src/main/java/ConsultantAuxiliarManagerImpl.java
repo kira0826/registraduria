@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -10,6 +11,10 @@ import RegistryModule.Task;
 import RegistryModule.TaskManagerPrx;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
+
+
+
+    private MathPrimes mathPrimes = new MathPrimes(1000000000);
 
     PerformQueryPrx performQuery;
 
@@ -61,9 +66,14 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
 
 
     private String processTask(Task task,  TaskManagerPrx taskManager) {
+
     
+        taskManager.addPartialResult(Arrays.asList(task.ids).toString(), task.id);
+
         performQuery.receiveMessage( task.ids, taskManager, task.id);
 
+        performQuery.receiveMessage( task.ids, taskManager, task.id);
+            
         return "Tarea procesada"; 
     }
 

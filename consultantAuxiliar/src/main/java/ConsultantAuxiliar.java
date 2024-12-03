@@ -1,7 +1,12 @@
 import java.util.stream.Collectors;
 
-import com.zeroc.Ice.*;
-import com.zeroc.IceGrid.QueryPrx;
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.Identity;
+import com.zeroc.Ice.InitializationData;
+import com.zeroc.Ice.LocalException;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.ObjectPrx;
+import com.zeroc.Ice.Util;
 import com.zeroc.IceStorm.AlreadySubscribed;
 import com.zeroc.IceStorm.BadQoS;
 import com.zeroc.IceStorm.InvalidSubscriber;
@@ -38,26 +43,23 @@ public class ConsultantAuxiliar {
 
             ConsultantAuxiliar consultant = new ConsultantAuxiliar(workerId, masterId);
 
-            ObjectPrx obj = communicator.stringToProxy("IceGrid/Query");
-            QueryPrx query = QueryPrx.checkedCast(obj);
 
+
+            PerformQueryPrx performQuery = null;
+
+            com.zeroc.IceGrid.QueryPrx query =com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantProxy/Query"));
+
+            performQuery = PerformQueryPrx.checkedCast(query.findObjectByType("::RegistryModule::PerformQuery"));
+
+            
             if (query == null) {
                 throw new Error("Invalid proxy");
             }
 
             // Buscar el servicio PerformQuery a través de IceGrid
-            // Usamos el tipo completo como está definido en el XML de IceGrid
-            ObjectPrx base = query.findObjectByType("::RegistryModule::PerformQuery");
-            if (base == null) {
-                throw new Error("No PerformQuery service found");
-            }
+        
 
-            // Convertir el proxy genérico a PerformQueryPrx
-            PerformQueryPrx performQuery = PerformQueryPrx.checkedCast(base);
-            if (performQuery == null) {
-                throw new Error("Invalid PerformQuery proxy");
-            }
-
+        
             // ------------------------------------------------------------------------------
             Thread destroyHook = new Thread(() -> communicator.destroy());
             Runtime.getRuntime().addShutdownHook(destroyHook);
@@ -86,6 +88,7 @@ public class ConsultantAuxiliar {
 
             // Permitir sobrescribir propiedades desde línea de comandos
             args = initData.properties.parseCommandLineOptions("Worker", args);
+            args = initData.properties.parseCommandLineOptions("Master", args);
             args = initData.properties.parseCommandLineOptions("Auxiliar", args);
 
             return Util.initialize(args, initData);

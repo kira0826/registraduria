@@ -8,34 +8,33 @@
             <parameter name="master_id"/>
             <parameter name="subscriber_endpoints"/>
             
-            <server id="ConsultantAuxiliarServer-${index}" exe="java" activation="always">
+            <server id="ConsultantAuxiliarServer-${worker_id}" exe="java" activation="always">
                 <option>-jar</option>
-                <option>/home/computacion2/icegrid_node/jars/consultantAuxiliar-all.jar</option>
+                <option>/home/computacion2/icegrid_node/jars/consultantAuxiliar.jar</option>
                 <option>--Worker.ID=${worker_id}</option>
                 <option>--Master.ID=${master_id}</option>
                 <option>--Auxiliar.Subscriber.Endpoints=${subscriber_endpoints}</option>
-                <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${index}.stderr.log" />
-                <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${index}.stdout.log" />
-                <adapter name="ConsultantAuxiliarAdapter" endpoints="${subscriber_endpoints}">
-                    <object identity="ConsultantAuxiliarManagerIdentity-${worker_id}" type="::RegistryModule::ConsultantAuxiliarManager" property="Identity" />
-                </adapter>
+                <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${worker_id}.stderr.log" />
+                <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/ConsultantAuxiliarServer-${worker_id}.stdout.log" />
+                <property name="Ice.ServerIdleTime" value="0"/>
+                <property name="IceGrid.Node.WaitTime" value="60"/>
             </server>   
         </server-template>
     </application>
 
     <node name="Node3">
-        <server-instance template="ConsultantAuxiliarServer" index="1" 
+        <server-instance template="ConsultantAuxiliarServer" 
             worker_id="1" master_id="1" subscriber_endpoints="tcp -h 10.147.19.147 -p 12001"/>
     </node>
 
     <node name="Node4">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="2" master_id="2" subscriber_endpoints="tcp -h 10.147.19.230 -p 12002"/>
+            worker_id="2" master_id="1" subscriber_endpoints="tcp -h 10.147.19.5 -p 12002"/>
     </node>
 
     <node name="Node5">
         <server-instance template="ConsultantAuxiliarServer" 
-            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.139 -p 12003"/>
+            worker_id="3" master_id="2" subscriber_endpoints="tcp -h 10.147.19.214 -p 12003"/>
     </node>
 
     <node name="Node6">

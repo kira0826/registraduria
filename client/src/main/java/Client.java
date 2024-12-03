@@ -1,13 +1,13 @@
-import RegistryModule.CallbackPrx;
-import RegistryModule.ConsultantServiceManagerPrx;
-import com.zeroc.Ice.Communicator;
-import com.zeroc.Ice.Exception;
-import com.zeroc.Ice.ObjectAdapter;
-import com.zeroc.Ice.ObjectPrx;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.ObjectAdapter;
+import com.zeroc.Ice.ObjectPrx;
+
+import RegistryModule.CallbackPrx;
+import RegistryModule.ConsultantServiceManagerPrx;
 
 public class Client {
     private static final Scanner sc = new Scanner(System.in);
@@ -39,7 +39,7 @@ public class Client {
 
         ConsultantServiceManagerPrx consultantServiceManager = null;
 
-        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("RegistryModule/Query"));
+        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
         consultantServiceManager = ConsultantServiceManagerPrx.checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
 
         if(consultantServiceManager == null)
@@ -52,7 +52,7 @@ public class Client {
         int n = getThreadPoolSize();
         String filePath = getFilePath();
 
-        consultantServiceManager.setPoolsize(n);
+        //consultantServiceManager.setPoolsize(n);
         consultantServiceManager.searchDocumentsByPath(filePath,callback);
 
 

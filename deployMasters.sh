@@ -5,30 +5,22 @@
 # -----------------------------
 
 # Número de nodos a desplegar
-NUM_NODES=6
+NUM_NODES=2
 
 # Lista de direcciones de los nodos (usuario@host)
 NODE_ADDRESSES=(
-    "computacion2@xhgrid17"
-    "computacion2@xhgrid18"
-    "computacion2@xhgrid9"
-    "computacion2@xhgrid11"
-    "computacion2@xhgrid4"
-    "computacion2@xhgrid8"
+    "computacion2@xhgrid7"
+    "computacion2@xhgrid16"
 )
 
 # Lista de Endpoints para cada nodo (uno por nodo)
 NODE_ENDPOINTS=(
-    "tcp -h 10.147.19.85"
-    "tcp -h 10.147.19.239"
-    "tcp -h 10.147.19.147"
-    "tcp -h 10.147.19.5"
-    "tcp -h 10.147.19.214"
-    "tcp -h 10.147.19.137"
+    "tcp -h 10.147.19.139"
+    "tcp -h 10.147.19.83"
 )
 
 # IP del Locator (Registro)
-LOCATOR_IP="10.147.19.138"
+LOCATOR_IP="10.147.19.116"
 LOCATOR_PORT="30000"
 
 # Ruta al ejecutable de icegridnode
@@ -60,7 +52,7 @@ mkdir -p "$CONFIG_DIR"
     for (( i=0; i<$NUM_NODES; i++ ))
     do
         (
-            NODE_NAME="Node$((i+1))"
+            NODE_NAME="NodeMaster$((i+1))"
             USER_AT_HOST="${NODE_ADDRESSES[$i]}"
             NODE_ENDPOINT="${NODE_ENDPOINTS[$i]}"
 
@@ -76,7 +68,7 @@ IceGrid.Node.Endpoints=$NODE_ENDPOINT
 IceGrid.Node.Data=$NODE_DATA_DIR
 IceGrid.Node.CollocateRegistry=0
 
-Ice.Default.Locator=registryConsultantProxy/Locator:tcp -h $LOCATOR_IP -p $LOCATOR_PORT
+Ice.Default.Locator=registryConsultantClient/Locator:tcp -h $LOCATOR_IP -p $LOCATOR_PORT
 EOF
 
             # Ruta local al archivo de configuración de admin

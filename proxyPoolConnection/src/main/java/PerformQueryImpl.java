@@ -20,16 +20,21 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
     private Map<String, String> executeQuery(String query, Current current) {
         Map<String, String> resultMap = new HashMap<>();
 
+        System.out.println("Executing query with length: " + query.length());
+
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement stmt = connection.prepareStatement(query);
-             ResultSet rs = stmt.executeQuery()) {
+                PreparedStatement stmt = connection.prepareStatement(query);
+                ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 ResultSetMetaData metaData = rs.getMetaData();
                 int columnCount = metaData.getColumnCount();
 
-                String documento = rs.getString("documento");
+                System.out.println("Column count: " + columnCount);
+                System.out.println("Column name: " + metaData.getColumnName(1));
 
+                String documento = rs.getString("documento");
+                System.out.println("Documento: " + documento);
                 StringJoiner detallesJoiner = new StringJoiner(", ");
                 for (int i = 1; i <= columnCount; i++) {
                     String columnValue = rs.getString(i);
@@ -71,14 +76,12 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
 
     @Override
     public void receiveMessage(String[] ids, TaskManagerPrx taskManager, String taskId, Current current) {
+
+        System.out.println("Received message with ids: " + ids.length);
         String query = makeQuery(ids, current);
-        Map<String,String> result = executeQuery(query, current);
+        Map<String, String> result = executeQuery(query, current);
         taskManager.addPartialResult(result, taskId);
 
-        }
-
-  
-
-    
+    }
 
 }

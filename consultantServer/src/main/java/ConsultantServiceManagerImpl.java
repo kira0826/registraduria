@@ -1,11 +1,15 @@
-import RegistryModule.*;
+import java.util.stream.Collectors;
+
 import com.zeroc.Ice.Communicator;
 import com.zeroc.Ice.Current;
 import com.zeroc.Ice.LocalException;
 import com.zeroc.IceStorm.TopicManagerPrx;
 import com.zeroc.IceStorm.TopicPrx;
 
-import java.util.stream.Collectors;
+import RegistryModule.CallbackPrx;
+import RegistryModule.ConsultantAuxiliarManagerPrx;
+import RegistryModule.Response;
+import RegistryModule.TaskManagerPrx;
 
 public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantServiceManager {
 
@@ -63,13 +67,16 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
             System.out.println("Publishing events. Press ^C to terminate the application.");
             long startTime = System.currentTimeMillis();
             if (taskManager.getRemainingTasks() == 1) {
+                System.out.println("Usando el private worker");
                 privateWorker.launch(taskManager);
             } else {
                 while (taskManager.getRemainingTasks() > 0) {
+                    System.out.println("Usando el general worker");
                     generalWorker.launch(taskManager);
                 }
             }
-            while(taskManager.isCompleted()){}
+            while (!taskManager.isCompleted()) {
+            }
             long endTime = System.currentTimeMillis();
             long totalTime = endTime - startTime;
             callbackPrx.reportResponse(new Response(totalTime, taskManager.getResult()));

@@ -114,26 +114,43 @@ public class TaskManagerImpl implements TaskManager {
         }
     }
 
-private void readPath() {
-        String jarDir;
-        try {
-            jarDir = new File(TaskManagerImpl.class.getProtectionDomain()
-                    .getCodeSource()
-                    .getLocation()
-                    .toURI()).getParent();
-        } catch (Exception e) {
-            System.out.println("Error al obtener el directorio del JAR");
-            e.printStackTrace();
+    private void readPath() {
+        if (path == null || path.isEmpty()) {
+            System.err.println("Error: La ruta del archivo no está definida");
             return;
         }
-        File file = new File(jarDir, path);
+    
+        File file = new File(path);
+        
+        // Si la ruta no es absoluta, intentamos resolver relativa al directorio de trabajo
+        if (!file.isAbsolute()) {
+            String workingDir = System.getProperty("user.dir");
+            file = new File(workingDir, path);
+        }
+    
+        System.out.println("Intentando leer archivo desde: " + file.getAbsolutePath());
+        
+        if (!file.exists()) {
+            System.err.println("Error: El archivo no existe en la ruta: " + file.getAbsolutePath());
+            return;
+        }
+    
+        if (!file.canRead()) {
+            System.err.println("Error: No hay permisos de lectura para el archivo: " + file.getAbsolutePath());
+            return;
+        }
+    
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                cedulasList.add(line.trim());
+                if (!line.trim().isEmpty()) {  // Ignoramos líneas vacías
+                    cedulasList.add(line.trim());
+                }
             }
+            System.out.println("Se cargaron " + cedulasList.size() + " cédulas del archivo");
         } catch (IOException e) {
-            System.out.println("Error al leer el archivo: " + file.getAbsolutePath());
+            System.err.println("Error al leer el archivo: " + file.getAbsolutePath());
+            System.err.println("Mensaje de error: " + e.getMessage());
             e.printStackTrace();
         }
     }

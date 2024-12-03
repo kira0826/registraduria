@@ -79,7 +79,11 @@ public class Client {
     }
 
     private static String getFilePath() {
+
+        System.out.println("Bienvenido al sistema de votaciones");
         String filePath = null;
+
+        System.out.println("Despues del file path");
 
         while (true) {
             System.out.println("Ingresa la ruta del archivo para iniciar consulta o escribe 'exit' para salir:");

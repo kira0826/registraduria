@@ -49,6 +49,10 @@ public class ConsultantAuxiliar {
 
             com.zeroc.IceGrid.QueryPrx query =com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantProxy/Query"));
 
+            if (query == null) {
+                throw new Error("Invalid proxy");
+            }
+
             performQuery = PerformQueryPrx.checkedCast(query.findObjectByType("::RegistryModule::PerformQuery"));
 
             
@@ -68,7 +72,11 @@ public class ConsultantAuxiliar {
         } catch (LocalException e) {
             e.printStackTrace();
             System.exit(1);
+        }catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
+
 
     }
 

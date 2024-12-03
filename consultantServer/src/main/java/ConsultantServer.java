@@ -64,6 +64,7 @@ public class ConsultantServer {
             initData.properties.load("config.pub");
 
             args = initData.properties.parseCommandLineOptions("Master", args);
+            args = initData.properties.parseCommandLineOptions("Worker", args);
 
             return Util.initialize(args, initData);
         } catch (LocalException e) {

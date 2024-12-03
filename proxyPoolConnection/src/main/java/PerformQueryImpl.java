@@ -71,8 +71,6 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
 
     @Override
     public void receiveMessage(String[] ids, TaskManagerPrx taskManager, String taskId, Current current) {
-
-
         String query = makeQuery(ids, current);
         Map<String,String> result = executeQuery(query, current);
         taskManager.addPartialResult(result, taskId);

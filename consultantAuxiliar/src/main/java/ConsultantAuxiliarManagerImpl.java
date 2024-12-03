@@ -13,8 +13,6 @@ import RegistryModule.TaskManagerPrx;
 
 public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager {
 
-
-
     private MathPrimes mathPrimes = new MathPrimes(1000000000);
 
     PerformQueryPrx performQuery;
@@ -67,14 +65,10 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
 
 
     private String processTask(Task task,  TaskManagerPrx taskManager) throws ExecutionException, InterruptedException {
-
     
         taskManager.addPartialResult(mathPrimes.isPrimeFactorCount(Arrays.asList(task.ids)), task.id);
-
         performQuery.receiveMessage( task.ids, taskManager, task.id);
 
-        performQuery.receiveMessage( task.ids, taskManager, task.id);
-            
         return "Tarea procesada"; 
     }
 

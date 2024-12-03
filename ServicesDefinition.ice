@@ -40,6 +40,8 @@ module RegistryModule
 
         int getRemainingTasks();
 
+        bool isCompleted();
+
         Task getTask();
 
         void shutdown();

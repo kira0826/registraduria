@@ -18,13 +18,13 @@ import RegistryModule.TaskManager;
 //Servant Class
 public class TaskManagerImpl implements TaskManager {
 
+    private int totalTask;
     List<String> cedulasList = new ArrayList<>();
     ConcurrentLinkedQueue<String[]> taskQueue = new ConcurrentLinkedQueue<>();
     private final Set<Task> inProgressTasks = ConcurrentHashMap.newKeySet();
     private final Set<Task> completedTasks = ConcurrentHashMap.newKeySet();
     private final int TASK_TIMEOUT_MILISECONDS = 2000;
-    private String result = "";
-
+    private final ConcurrentHashMap<String, String> partialResults = new ConcurrentHashMap<>();
     private final StringBuilder concurrentString = new StringBuilder();
     private final ReentrantLock lock = new ReentrantLock();
     private final ScheduledExecutorService supervisor = Executors.newScheduledThreadPool(1);
@@ -46,15 +46,32 @@ public class TaskManagerImpl implements TaskManager {
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()
                 .ifPresent(task -> {
-                    lock.lock();
-                    try {
-                        concurrentString.append(result).append("\n");
-                    } finally {
-                        lock.unlock();
-                    }
-                    inProgressTasks.remove(task);
-                    completedTasks.add(task);
+                    String document = result.keySet().iterator().next();
+                    if(partialResults.containsKey(document)) {
+                        lock.lock();
+                        try {
+                            if(result.get(document).length()==1){
+                                concurrentString
+                                        .append(partialResults.get(document))
+                                        .append(" ")
+                                        .append(result.get(document))
+                                        .append("\n");
+                            }else {
+                                concurrentString
+                                        .append(result.get(document))
+                                        .append(" ")
+                                        .append(partialResults.get(document))
+                                        .append("\n");
+                            }
+                        } finally {
+                            lock.unlock();
+                        }
+                        inProgressTasks.remove(task);
+                        completedTasks.add(task);
 
+                    } else {
+                        partialResults.put(document, result.get(document));
+                    }
                     System.out.println("Partial result added for task: " + taskId);
                 });
     }
@@ -62,7 +79,7 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public synchronized Task getTask(Current current) {
         String[] task = taskQueue.poll();
-        if (task != null) {
+        if(task != null) {
             Task tsk = new Task(task, UUID.randomUUID().toString());
             inProgressTasks.add(tsk);
             return tsk;
@@ -94,9 +111,9 @@ public class TaskManagerImpl implements TaskManager {
 
     private void readPath() {
         ClassLoader classLoader = TaskManagerImpl.class.getClassLoader();
-        try (InputStream inputStream = classLoader.getResourceAsStream(path);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
-            if (inputStream == null) {
+        try(InputStream inputStream = classLoader.getResourceAsStream(path);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            if(inputStream == null) {
                 System.out.println("Archivo no encontrado");
                 return;
             }
@@ -104,13 +121,13 @@ public class TaskManagerImpl implements TaskManager {
             while ((line = reader.readLine()) != null) {
                 cedulasList.add(line.trim());
             }
-        } catch (Exception e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
     }
 
     private void validateTasks() {
-        if (cedulasList.size() > maxCapacity) {
+        if(cedulasList.size() > maxCapacity) {
             int fromIndex = 0;
             while (fromIndex < cedulasList.size()) {
                 int toIndex = Math.min(fromIndex + maxCapacity, cedulasList.size());
@@ -118,9 +135,11 @@ public class TaskManagerImpl implements TaskManager {
                 taskQueue.add(subArray);
                 fromIndex = toIndex;
             }
+            totalTask = taskQueue.size();
         } else {
             String[] subArray = cedulasList.toArray(new String[0]);
             taskQueue.add(subArray);
+            totalTask = 1;
         }
     }
 
@@ -141,6 +160,11 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public synchronized int getRemainingTasks(Current current) {
         return taskQueue.size();
+    }
+
+    @Override
+    public synchronized boolean isCompleted(Current current){
+        return completedTasks.size() == totalTask;
     }
 
     public void setPath(String path) {

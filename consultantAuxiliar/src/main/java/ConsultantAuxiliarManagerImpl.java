@@ -66,8 +66,13 @@ public class ConsultantAuxiliarManagerImpl implements ConsultantAuxiliarManager 
 
     private String processTask(Task task,  TaskManagerPrx taskManager) throws ExecutionException, InterruptedException {
     
+
+
         taskManager.addPartialResult(mathPrimes.isPrimeFactorCount(Arrays.asList(task.ids)), task.id);
+        System.out.println("Despues de enviar el addPartialResult en el ConsultantAuxiliarManagerImpl");
+        
         performQuery.receiveMessage( task.ids, taskManager, task.id);
+        System.out.println("Despues de enviar el receiveMessage en el ConsultantAuxiliarManagerImpl");
 
         return "Tarea procesada"; 
     }

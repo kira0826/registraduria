@@ -13,46 +13,72 @@ public class Client {
     private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
+        System.out.println("Iniciando el cliente...");
         int status = 0;
         List<String> extraArgs = new ArrayList<>();
         try (Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs)) {
+            System.out.println("Ice communicator inicializado.");
             if (!extraArgs.isEmpty()) {
                 System.err.println("too many arguments");
                 status = 1;
             } else {
                 status = run(communicator);
             }
+        }catch (Exception e) {
+            System.err.println("Excepción en main: " + e.getMessage());
+            e.printStackTrace();
+            status = 1;
         }
         System.exit(status);
     }
 
     private static int run(Communicator communicator) {
+        System.out.println("Ejecutando cliente...");
 
-        ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback", "tcp -h 0.0.0.0");
-        com.zeroc.Ice.Object clientCallback = new CallbackI();
-        ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
-        CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
-        adapter.activate();
+try {
 
-        ConsultantServiceManagerPrx consultantServiceManager = null;
 
-        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx
-                .checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
-        consultantServiceManager = ConsultantServiceManagerPrx
-                .checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
+    ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback", "tcp -h 0.0.0.0");
+    System.out.println("ObjectAdapter Callback creado");
 
-        if (consultantServiceManager == null) {
-            System.err.println("couldn't find a `::RegistryModule::ConsultantServiceManager' object");
-            return 1;
-        }
+    com.zeroc.Ice.Object clientCallback = new CallbackI();
+    ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
+    CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
+    System.out.println("Callback registrado con UUID: " + callbackProxy);
 
-        //int n = getThreadPoolSize();
-        String filePath = getFilePath();
+    adapter.activate();
+    System.out.println("Adapter activado.");
 
-        // consultantServiceManager.setPoolsize(n);
-        consultantServiceManager.searchDocumentsByPath(filePath, callback);
 
-        return 0;
+    ConsultantServiceManagerPrx consultantServiceManager = null;
+
+    com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx
+            .checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
+
+    consultantServiceManager = ConsultantServiceManagerPrx
+            .checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
+
+    if (consultantServiceManager == null) {
+        System.err.println("couldn't find a `::RegistryModule::ConsultantServiceManager' object");
+        return 1;
+    }
+    System.out.println("ConsultantServiceManager obtenido correctamente.");
+
+
+    //int n = getThreadPoolSize();
+    String filePath = getFilePath();
+
+    // consultantServiceManager.setPoolsize(n);
+    consultantServiceManager.searchDocumentsByPath(filePath, callback);
+    System.out.println("Invocación de searchDocumentsByPath completada.");
+
+
+    return 0;
+}catch (Exception e) {
+    System.err.println("Excepción en run: " + e.getMessage());
+    e.printStackTrace();
+    return 1;
+}
     }
 
     private static int getThreadPoolSize() {

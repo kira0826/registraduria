@@ -27,11 +27,13 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
 
     @Override
     public void setPoolsize(int n, Current current) {
+        System.out.println("Antes de llamar a setPoolSizego");
         this.poolSize = n;
     }
 
     @Override
     public void searchDocumentsByPath(String path, CallbackPrx callback, Current current) {
+        System.out.println("Antes de llamar al run");
         run(path, callback);
     }
 

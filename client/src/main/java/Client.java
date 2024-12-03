@@ -39,7 +39,7 @@ public class Client {
 
         ConsultantServiceManagerPrx consultantServiceManager = null;
 
-        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("RegistryModule/Query"));
+        com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
         consultantServiceManager = ConsultantServiceManagerPrx.checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
 
         if(consultantServiceManager == null)

@@ -47,6 +47,10 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public void addPartialResult(Map<String, String> result, String taskId, Current current) {
+
+    
+
+
         inProgressTasks.stream()
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()
@@ -68,7 +72,11 @@ public class TaskManagerImpl implements TaskManager {
                                         .append(partialResults.get(document))
                                         .append("\n");
                             }
-                        } finally {
+                        }catch (Exception e){
+                            System.out.println("Error on task manager: " + e.getMessage());
+                        } 
+                    
+                        finally {
                             lock.unlock();
                         }
                         inProgressTasks.remove(task);
@@ -193,11 +201,15 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public synchronized int getRemainingTasks(Current current) {
+
+        System.out.println("REMAINING TASKS ON TASK MANAGER" + taskQueue.size());
         return taskQueue.size();
     }
 
     @Override
     public synchronized boolean isCompleted(Current current) {
+
+        System.out.println("COMPLETED ON TASK MANAGER" + completedTasks.size() + " " + totalTask);
         return completedTasks.size() == totalTask;
     }
 

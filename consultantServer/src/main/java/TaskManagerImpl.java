@@ -56,16 +56,16 @@ public class TaskManagerImpl implements TaskManager {
                 .findFirst()
                 .ifPresent(task -> {
                     String document = result.keySet().iterator().next();
-                    if(partialResults.containsKey(document)) {
+                    if (partialResults.containsKey(document)) {
                         lock.lock();
                         try {
-                            if(result.get(document).length()==1){
+                            if (result.get(document).length() == 1) {
                                 concurrentString
                                         .append(partialResults.get(document))
                                         .append(" ")
                                         .append(result.get(document))
                                         .append("\n");
-                            }else {
+                            } else {
                                 concurrentString
                                         .append(result.get(document))
                                         .append(" ")
@@ -87,8 +87,9 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public synchronized Task getTask(Current current) {
+        System.out.println("Getting task");
         String[] task = taskQueue.poll();
-        if(task != null) {
+        if (task != null) {
             Task tsk = new Task(task, UUID.randomUUID().toString());
             inProgressTasks.add(tsk);
             return tsk;
@@ -99,6 +100,7 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public void shutdown(Current current) {
+        System.out.println("Shutting down");
         supervisor.shutdown();
         lock.lock();
         try {
@@ -110,6 +112,7 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public String getResult(Current current) {
+        System.out.println("Getting result");
         lock.lock();
         try {
             return concurrentString.toString();
@@ -123,31 +126,32 @@ public class TaskManagerImpl implements TaskManager {
             System.err.println("Error: La ruta del archivo no está definida");
             return;
         }
-    
+
         File file = new File(path);
-        
-        // Si la ruta no es absoluta, intentamos resolver relativa al directorio de trabajo
+
+        // Si la ruta no es absoluta, intentamos resolver relativa al directorio de
+        // trabajo
         if (!file.isAbsolute()) {
             String workingDir = System.getProperty("user.dir");
             file = new File(workingDir, path);
         }
-    
+
         System.out.println("Intentando leer archivo desde: " + file.getAbsolutePath());
-        
+
         if (!file.exists()) {
             System.err.println("Error: El archivo no existe en la ruta: " + file.getAbsolutePath());
             return;
         }
-    
+
         if (!file.canRead()) {
             System.err.println("Error: No hay permisos de lectura para el archivo: " + file.getAbsolutePath());
             return;
         }
-    
+
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (!line.trim().isEmpty()) {  // Ignoramos líneas vacías
+                if (!line.trim().isEmpty()) { // Ignoramos líneas vacías
                     cedulasList.add(line.trim());
                 }
             }
@@ -160,7 +164,8 @@ public class TaskManagerImpl implements TaskManager {
     }
 
     private void validateTasks() {
-        if(cedulasList.size() > maxCapacity) {
+        System.out.println("Validando tareas");
+        if (cedulasList.size() > maxCapacity) {
             int fromIndex = 0;
             while (fromIndex < cedulasList.size()) {
                 int toIndex = Math.min(fromIndex + maxCapacity, cedulasList.size());
@@ -196,7 +201,7 @@ public class TaskManagerImpl implements TaskManager {
     }
 
     @Override
-    public synchronized boolean isCompleted(Current current){
+    public synchronized boolean isCompleted(Current current) {
         return completedTasks.size() == totalTask;
     }
 

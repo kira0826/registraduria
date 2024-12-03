@@ -27,7 +27,7 @@ public class ConsultantServer {
 
             Thread destroyHook = new Thread(() -> communicator.destroy());
             Runtime.getRuntime().addShutdownHook(destroyHook);
-
+            
             // Create TaskManager
             ObjectAdapter adapter = communicator.createObjectAdapter("TaskManager");
             TaskManager taskManager = new TaskManagerImpl();

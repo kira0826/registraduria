@@ -55,34 +55,46 @@ public class TaskManagerImpl implements TaskManager {
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()
                 .ifPresent(task -> {
+
+                    System.out.println("Task found: " + taskId);
                     String document = result.keySet().iterator().next();
                     if (partialResults.containsKey(document)) {
                         lock.lock();
                         try {
+
+                            System.out.println("lo que llega al filtro de task manager: "+result.get(document));
                             if (result.get(document).length() == 1) {
+
+                                System.out.println("Longitud del documento: " + result.get(document).length());
                                 concurrentString
                                         .append(partialResults.get(document))
                                         .append(" ")
                                         .append(result.get(document))
                                         .append("\n");
                             } else {
+                                System.out.println("Longitud del documento: " + result.get(document).length());
                                 concurrentString
                                         .append(result.get(document))
                                         .append(" ")
                                         .append(partialResults.get(document))
                                         .append("\n");
                             }
+
+                            System.out.println("Despues del append: " + concurrentString.toString());
+                            inProgressTasks.remove(task);
+                            completedTasks.add(task);
                         }catch (Exception e){
                             System.out.println("Error on task manager: " + e.getMessage());
                         } 
-                    
                         finally {
                             lock.unlock();
                         }
-                        inProgressTasks.remove(task);
-                        completedTasks.add(task);
+             
 
                     } else {
+
+
+                        System.out.println("ingresa un valor cualquiera ");
                         partialResults.put(document, result.get(document));
                     }
                     System.out.println("Partial result added for task: " + taskId);
@@ -133,8 +145,6 @@ public class TaskManagerImpl implements TaskManager {
 
         File file = new File(path);
 
-        // Si la ruta no es absoluta, intentamos resolver relativa al directorio de
-        // trabajo
         if (!file.isAbsolute()) {
             String workingDir = System.getProperty("user.dir");
             file = new File(workingDir, path);
@@ -209,7 +219,6 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public synchronized boolean isCompleted(Current current) {
 
-        System.out.println("COMPLETED ON TASK MANAGER" + completedTasks.size() + " " + totalTask);
         return completedTasks.size() == totalTask;
     }
 

@@ -86,7 +86,7 @@ try {
 
         System.out.println("Bienvenido al sistema de votaciones");
 
-        while (true) {
+        while (true) {  
             System.out.println("Ingresa el N para el thread pool (debe ser un número entero positivo):");
             String input = sc.nextLine().trim();
 

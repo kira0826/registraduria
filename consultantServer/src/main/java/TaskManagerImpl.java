@@ -47,6 +47,10 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public void addPartialResult(Map<String, String> result, String taskId, Current current) {
+
+
+        System.out.println("Adding partial result for task: " + taskId);
+        System.out.println("Result: " + result);
         inProgressTasks.stream()
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()

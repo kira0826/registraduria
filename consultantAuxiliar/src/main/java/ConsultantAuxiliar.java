@@ -49,6 +49,8 @@ public class ConsultantAuxiliar {
 
             com.zeroc.IceGrid.QueryPrx query =com.zeroc.IceGrid.QueryPrx.checkedCast(communicator.stringToProxy("registryConsultantProxy/Query"));
 
+            System.out.println("Despues del query del ConsultanAuxiliar"); 
+
             if (query == null) {
                 throw new Error("Invalid proxy");
             }

@@ -79,6 +79,7 @@ public class ConsultantServiceManagerImpl implements RegistryModule.ConsultantSe
             }
             long endTime = System.currentTimeMillis();
             long totalTime = endTime - startTime;
+            
             callbackPrx.reportResponse(new Response(totalTime, taskManager.getResult()));
             taskManager.shutdown();
             return 0;

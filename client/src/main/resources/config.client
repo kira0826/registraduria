@@ -1,2 +1,5 @@
 Ice.Default.Locator=registryConsultantClient/Locator:tcp -h 10.147.19.116 -p 30000
 
+CallBack.Endpoints = tcp -h 10.147.19.104
+
+Ice.ThreadPool.Server.Size=6

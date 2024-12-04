@@ -1,3 +1,4 @@
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -9,11 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 
 import com.zeroc.Ice.Current;
 
@@ -32,70 +29,58 @@ public class TaskManagerImpl implements TaskManager {
     private final ConcurrentHashMap<String, String> partialResults = new ConcurrentHashMap<>();
     private final StringBuilder concurrentString = new StringBuilder();
     private final ReentrantLock lock = new ReentrantLock();
-    private final ScheduledExecutorService supervisor = Executors.newScheduledThreadPool(1);
-
+    
     private String path;
-    final int maxCapacity = 250;
+    final int maxCapacity = 500000;
 
     @Override
     public void createTasks(String path, Current current) {
         setPath(path);
         readPath();
         validateTasks();
-        startSupervisor();
     }
 
     @Override
-    public void addPartialResult(Map<String, String> result, String taskId, Current current) {
+    public synchronized void addPartialResult(Map<String, String> result, String taskId, Current current) {
 
-
-        System.out.println("Adding partial result for task: " + taskId);
-        System.out.println("Result: " + result);
         inProgressTasks.stream()
                 .filter(task -> task.id.equals(taskId))
                 .findFirst()
                 .ifPresent(task -> {
 
-                    System.out.println("Task found: " + taskId);
-                    String document = result.keySet().iterator().next();
-                    if (partialResults.containsKey(document)) {
-                        lock.lock();
-                        try {
+                    for (String document : result.keySet()) {
 
-                            System.out.println("lo que llega al filtro de task manager: "+result.get(document));
-                            if (result.get(document).length() == 1) {
+                        if (partialResults.containsKey(document)) {
+                            lock.lock();
+                            try {
 
-                                System.out.println("Longitud del documento: " + result.get(document).length());
-                                concurrentString
-                                        .append(partialResults.get(document))
-                                        .append(" ")
-                                        .append(result.get(document))
-                                        .append("\n");
-                            } else {
-                                System.out.println("Longitud del documento: " + result.get(document).length());
-                                concurrentString
-                                        .append(result.get(document))
-                                        .append(" ")
-                                        .append(partialResults.get(document))
-                                        .append("\n");
+                                if (result.get(document).length() == 1) {
+
+
+                                    concurrentString
+                                            .append(partialResults.get(document))
+                                            .append(" ")
+                                            .append(result.get(document))
+                                            .append("\n");
+                                } else {
+
+                                    concurrentString
+                                            .append(result.get(document))
+                                            .append(" ")
+                                            .append(partialResults.get(document))
+                                            .append("\n");
+                                }
+
+                                completedTasks.add(task);
+                                inProgressTasks.remove(task);
+                            } catch (Exception e) {
+                            } finally {
+                                lock.unlock();
                             }
 
-                            System.out.println("Despues del append: " + concurrentString.toString());
-                            inProgressTasks.remove(task);
-                            completedTasks.add(task);
-                        }catch (Exception e){
-                            System.out.println("Error on task manager: " + e.getMessage());
-                        } 
-                        finally {
-                            lock.unlock();
+                        } else {
+                            partialResults.put(document, result.get(document));
                         }
-             
-
-                    } else {
-
-
-                        System.out.println("ingresa un valor cualquiera ");
-                        partialResults.put(document, result.get(document));
                     }
                     System.out.println("Partial result added for task: " + taskId);
                 });
@@ -117,7 +102,7 @@ public class TaskManagerImpl implements TaskManager {
     @Override
     public void shutdown(Current current) {
         System.out.println("Shutting down");
-        supervisor.shutdown();
+        //supervisor.shutdown();
         lock.lock();
         try {
             concurrentString.setLength(0);
@@ -195,24 +180,10 @@ public class TaskManagerImpl implements TaskManager {
         }
     }
 
-    private void startSupervisor() {
-        supervisor.scheduleAtFixedRate(() -> {
-            System.out.println("Revisando tareas");
-            List<Task> toReassign = inProgressTasks.stream()
-                    .filter(task -> !completedTasks.contains(task))
-                    .collect(Collectors.toList());
-            for (Task task : toReassign) {
-                taskQueue.add(task.ids);
-                inProgressTasks.remove(task);
-                System.out.println("Reassigning task: " + task.id);
-            }
-        }, TASK_TIMEOUT_MILISECONDS, TASK_TIMEOUT_MILISECONDS, TimeUnit.MILLISECONDS);
-    }
 
     @Override
     public synchronized int getRemainingTasks(Current current) {
 
-        System.out.println("REMAINING TASKS ON TASK MANAGER" + taskQueue.size());
         return taskQueue.size();
     }
 

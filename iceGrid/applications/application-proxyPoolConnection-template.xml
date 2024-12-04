@@ -12,6 +12,9 @@
                 <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/proxyPoolConnectionServer-${index}.stderr.log" />
                 <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/proxyPoolConnectionServer-${index}.stdout.log" />
                 <property name="dbHost" value="${dbHost}" />
+                <property name="Ice.ThreadPool.Server.Size" value="12"/>
+                <property name="Ice.ThreadPool.Server.SizeMax" value="14"/>
+                <property name="Ice.ThreadPool.Server.SizeWarn" value="13"/>
                 <adapter  name="ProxyPoolConnectionAdapter" endpoints="tcp -h ${host} ">
                     <object identity="ProxyPoolConnectionIdentity-${index}" type="::RegistryModule::PerformQuery" property="Identity" />
                 </adapter>

@@ -1,4 +1,8 @@
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringJoiner;
@@ -30,11 +34,8 @@ public class PerformQueryImpl implements RegistryModule.PerformQuery {
                 ResultSetMetaData metaData = rs.getMetaData();
                 int columnCount = metaData.getColumnCount();
 
-                System.out.println("Column count: " + columnCount);
-                System.out.println("Column name: " + metaData.getColumnName(1));
-
+        
                 String documento = rs.getString("documento");
-                System.out.println("Documento: " + documento);
                 StringJoiner detallesJoiner = new StringJoiner(", ");
                 for (int i = 1; i <= columnCount; i++) {
                     String columnValue = rs.getString(i);

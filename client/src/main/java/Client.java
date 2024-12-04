@@ -1,22 +1,37 @@
+
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import com.zeroc.Ice.Communicator;
+import com.zeroc.Ice.InitializationData;
+import com.zeroc.Ice.LocalException;
 import com.zeroc.Ice.ObjectAdapter;
 import com.zeroc.Ice.ObjectPrx;
+import com.zeroc.Ice.Util;
 
 import RegistryModule.CallbackPrx;
 import RegistryModule.ConsultantServiceManagerPrx;
+import utils.NetworkUtils;
 
 public class Client {
+
     private static final Scanner sc = new Scanner(System.in);
+
+    // Clase contenedora para la bandera de ejecución
+    private static class RunFlag {  
+
+        volatile boolean isRunning = true;
+    }
 
     public static void main(String[] args) {
         System.out.println("Iniciando el cliente...");
         int status = 0;
         List<String> extraArgs = new ArrayList<>();
-        try (Communicator communicator = com.zeroc.Ice.Util.initialize(args, "config.client", extraArgs)) {
+
+        try (Communicator communicator = initializeCommunicator(args)) {
             System.out.println("Ice communicator inicializado.");
             if (!extraArgs.isEmpty()) {
                 System.err.println("too many arguments");
@@ -24,7 +39,7 @@ public class Client {
             } else {
                 status = run(communicator);
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.err.println("Excepción en main: " + e.getMessage());
             e.printStackTrace();
             status = 1;
@@ -35,81 +50,65 @@ public class Client {
     private static int run(Communicator communicator) {
         System.out.println("Ejecutando cliente...");
 
-try {
+        RunFlag runFlag = new RunFlag(); // Instancia de la bandera de ejecución
 
+        try {
 
-    ObjectAdapter adapter = communicator.createObjectAdapterWithEndpoints("Callback", "tcp -h 0.0.0.0");
-    System.out.println("ObjectAdapter Callback creado");
+            //print properties 
+            System.out.println("Properties: " + communicator.getProperties().getPropertiesForPrefix("").entrySet().stream()
+                    .map(e -> e.getKey() + "=" + e.getValue()).collect(Collectors.joining(", ")));
 
-    com.zeroc.Ice.Object clientCallback = new CallbackI();
-    ObjectPrx callbackProxy = adapter.addWithUUID(clientCallback);
-    CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
-    System.out.println("Callback registrado con UUID: " + callbackProxy);
+            ObjectAdapter adapter = communicator.createObjectAdapter("CallBack");
 
-    adapter.activate();
-    System.out.println("Adapter activado.");
+            RegistryModule.Callback callbackPrx = new CallbackI();
 
+            ObjectPrx callbackProxy = adapter.add(callbackPrx, Util.stringToIdentity("CallBack"));
+            CallbackPrx callback = CallbackPrx.checkedCast(callbackProxy);
 
-    ConsultantServiceManagerPrx consultantServiceManager = null;
+            adapter.activate();
 
-    com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx
-            .checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
+            ConsultantServiceManagerPrx consultantServiceManager = null;
 
-    consultantServiceManager = ConsultantServiceManagerPrx
-            .checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
+            com.zeroc.IceGrid.QueryPrx query = com.zeroc.IceGrid.QueryPrx
+                    .checkedCast(communicator.stringToProxy("registryConsultantClient/Query"));
 
-    if (consultantServiceManager == null) {
-        System.err.println("couldn't find a `::RegistryModule::ConsultantServiceManager' object");
-        return 1;
-    }
-    System.out.println("ConsultantServiceManager obtenido correctamente.");
+            consultantServiceManager = ConsultantServiceManagerPrx
+                    .checkedCast(query.findObjectByType("::RegistryModule::ConsultantServiceManager"));
 
-
-    //int n = getThreadPoolSize();
-    String filePath = getFilePath();
-
-    // consultantServiceManager.setPoolsize(n);
-    consultantServiceManager.searchDocumentsByPath(filePath, callback);
-    System.out.println("Invocación de searchDocumentsByPath completada.");
-
-
-    return 0;
-}catch (Exception e) {
-    System.err.println("Excepción en run: " + e.getMessage());
-    e.printStackTrace();
-    return 1;
-}
-    }
-
-    private static int getThreadPoolSize() {
-        int n = -1;
-
-        System.out.println("Bienvenido al sistema de votaciones");
-
-        while (true) {  
-            System.out.println("Ingresa el N para el thread pool (debe ser un número entero positivo):");
-            String input = sc.nextLine().trim();
-
-            try {
-                n = Integer.parseInt(input);
-                if (n > 0) {
-                    break;
-                } else {
-                    System.out.println("El número debe ser positivo. Intenta nuevamente.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Entrada inválida. Por favor, ingresa un número entero.");
+            if (consultantServiceManager == null) {
+                System.err.println("couldn't find a `::RegistryModule::ConsultantServiceManager' object");
+                return 1;
             }
+            System.out.println("ConsultantServiceManager obtenido correctamente.");
+
+            // ------------------------------------------------------------------------------
+            Thread destroyHook = new Thread(() -> communicator.destroy());
+            Runtime.getRuntime().addShutdownHook(destroyHook);
+
+            // Ejecutar el bucle mientras la bandera esté activa
+            while (runFlag.isRunning) {
+                String filePath = getFilePath(runFlag);
+                if (filePath != null) { // Solo si se obtuvo una ruta válida
+                    consultantServiceManager.searchDocumentsByPath(filePath, callback);
+                }
+            }
+
+            // Opcional: Realizar limpieza adicional aquí si es necesario
+            communicator.waitForShutdown();
+
+            return 0;
+        } catch (Exception e) {
+            System.err.println("Excepción en run: " + e.getMessage());
+            e.printStackTrace();
+            return 1;
         }
-        return n;
     }
 
-    private static String getFilePath() {
-
+    private static String getFilePath(RunFlag runFlag) {
         System.out.println("Bienvenido al sistema de votaciones");
         String filePath = null;
 
-        System.out.println("Despues del file path");
+        System.out.println("Después del file path");
 
         while (true) {
             System.out.println("Ingresa la ruta del archivo para iniciar consulta o escribe 'exit' para salir:");
@@ -117,7 +116,8 @@ try {
 
             if (input.equalsIgnoreCase("exit")) {
                 System.out.println("Saliendo del sistema...");
-                System.exit(0);
+                runFlag.isRunning = false; // Cambiar la bandera para salir del bucle
+                return null; // Retornar null para no realizar ninguna acción adicional
             } else if (isValidFilePath(input)) {
                 filePath = input;
                 System.out.println("Ruta válida ingresada: " + filePath);
@@ -127,6 +127,36 @@ try {
             }
         }
         return filePath;
+    }
+
+    private static com.zeroc.Ice.Communicator initializeCommunicator(String[] args) {
+        try {
+            // Inicializar propiedades
+            InitializationData initData = new InitializationData();
+            initData.properties = Util.createProperties();
+
+            // Cargar archivo de configuración desde el JAR
+            initData.properties.load("config.client");
+
+            String ip = "";
+            try {
+                ip = NetworkUtils.getLocalIPAddress();
+            } catch (SocketException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            System.out.println("Current IP: " + ip);
+
+            initData.properties.setProperty("CallBack.Endpoints", "tcp -h " + ip + " -p 32500");
+
+            return Util.initialize(args, initData);
+        } catch (LocalException e) {
+            System.err.println("Error initializing Ice: " + e.getMessage());
+            System.exit(1);
+            return null;
+        }
+
     }
 
     private static boolean isValidFilePath(String path) {

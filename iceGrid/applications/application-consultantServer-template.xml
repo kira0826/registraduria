@@ -14,6 +14,9 @@
                 <option>--Master.ID=${master_id}</option>
                 <property name="Ice.StdErr" value="/home/computacion2/icegrid_node/jars/ConsultantServer-${master_id}.stderr.log" />
                 <property name="Ice.StdOut" value="/home/computacion2/icegrid_node/jars/ConsultantServer-${master_id}.stdout.log" />
+                <property name="Ice.ThreadPool.Server.Size" value="12"/>
+                <property name="Ice.ThreadPool.Server.SizeMax" value="14"/>
+                <property name="Ice.ThreadPool.Server.SizeWarn" value="13"/>
                 <adapter name="ConsultantServerAdapter">
                     <object identity="ConsultantServiceManagerIdentity-${master_id}" type="::RegistryModule::ConsultantServiceManager" property="Identity" />
                 </adapter>
